@@ -15,9 +15,7 @@ const sockserver = new WebSocketServer({ port: 443 })
 
 sockserver.on('connection', ws => {
     console.log('New connection!')
-    ws.clientNo = clientno;
-    ws.channel = null;
-    clientno += 1;
+    ws.clientNo = get_id();
 
     // console.log(ws);
 
@@ -37,33 +35,17 @@ sockserver.on('connection', ws => {
     })
 
     handle_event('subscribe', (ws, data) => {
-        // console.log(data)
         ws.channel = data.channel;
     })
 
     ws.on('message', dat => {
         const info = JSON.parse(dat);
-        console.log(info)
         const command = info.command;
         const data = info.data;
 
         if (command in registered_events) {
             registered_events[command](ws, data);
         }
-
-        // if (info.command == 'subscribe') {
-        //     ws.channel = info.channel;
-        // } else if (info.command == 'publish') {
-        //     if (ws.channel == null) {
-        //         return;
-        //     }
-        //     sockserver.clients.forEach(client => {
-        //         if (client.channel == ws.channel) {
-        //             client.send(JSON.stringify({"command": "publish", "data": info.data}))
-        //         }
-        //     })
-        // }
-
     })
 
     ws.onerror = function () {
@@ -73,4 +55,13 @@ sockserver.on('connection', ws => {
 
 function handle_event(event, callback) {
     registered_events[event] = callback;
+}
+
+// generates a maximum of 1000 ids
+function* get_id() {
+    let i = 0;
+    while (i < 1000) {
+        yield i;
+        i++;
+    }
 }
