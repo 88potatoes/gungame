@@ -71,7 +71,7 @@ function sendJSON(client, json) {
     client.send(JSON.stringify(json))
 }
 
-function parseJSON(client, json) {
+function parseJSON(json) {
     const info = JSON.parse(json);
     const command = info.command;
     const data = info.data;
