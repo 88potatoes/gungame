@@ -18,11 +18,11 @@ function get_id() {
     return id_generator.next().value;
 }
 
+const registered_events = {}
+
 sockserver.on('connection', ws => {
     ws.clientNo = get_id();
     console.log('New connection: id = %s', ws.clientNo)
-
-    registered_events = {}
 
     ws.on('close', () => console.log('Client has disconnected'))
 
@@ -32,7 +32,7 @@ sockserver.on('connection', ws => {
         }
         sockserver.clients.forEach(client => {
             if (client.channel == ws.channel) {
-                client.send(JSON.stringify({"command": "publish", "data": data.message}))
+                sendJSON(client, {"command": "publish", "data": data.message})
             }
         })
     })
@@ -41,10 +41,8 @@ sockserver.on('connection', ws => {
         ws.channel = data.channel;
     })
 
-    ws.on('message', dat => {
-        const info = JSON.parse(dat);
-        const command = info.command;
-        const data = info.data;
+    ws.on('message', json => {
+        const [command, data] = parseJSON(json);
 
         if (command in registered_events) {
             registered_events[command](ws, data);
@@ -67,4 +65,16 @@ function* create_id_generator() {
         yield i;
         i++;
     }
+}
+
+function sendJSON(client, json) {
+    client.send(JSON.stringify(json))
+}
+
+function parseJSON(client, json) {
+    const info = JSON.parse(json);
+    const command = info.command;
+    const data = info.data;
+
+    return [command, data];
 }
