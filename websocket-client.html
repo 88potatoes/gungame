@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+    <h1>Chat app</h1>
+    <form id="textInput">
+        <input type="text" id="text"/>
+        <input type="submit" value="send"/>
+    </form>
+    <div>
+        <h2>messages</h2>
+
+        <button id="channel1" >channel 1</button>
+        <button id="channel2" >channel 2</button>
+        <h3 id="channelNotifier">-- Channel --</h3>
+        <div id="messagebox">
+
+        </div>
+    </div>
+
+    <script>
+        const channelNotifier = document.querySelector('#channelNotifier');
+        const text = document.querySelector('#text');
+
+        function changeChannel(channel) {
+            channelNotifier.innerText = `You're now on channel ${channel}`
+        }
+
+        const websocket = new WebSocket('ws://localhost:443')
+
+        document.querySelector("#channel1").addEventListener('click', () => {
+            console.log("channel1 connected")
+            websocket.send(JSON.stringify({"command": "subscribe", "channel": 1}))
+            changeChannel(1)
+        })
+
+        document.querySelector("#channel2").addEventListener('click', () => {
+            console.log("channel2 connected")
+            websocket.send(JSON.stringify({'command': 'subscribe', 'channel': 'channel2'}))
+            changeChannel(2)
+        })
+
+        document.querySelector('#textInput').addEventListener('submit', (event) => {
+            event.preventDefault();
+            console.log(event)
+            websocket.send(JSON.stringify({"command": "publish", "data": text.value}))
+            text.value = ''
+        })
+
+        const messagebox = document.querySelector('#messagebox');
+
+        websocket.onmessage = (event) => {
+            const info = JSON.parse(event.data)
+
+            if (info.command == "fetchClientNo") {
+                clientNo = info.clientNo;
+                console.log("clientNo:", clientNo)
+            } else if (info.command == 'publish') {
+                messagebox.innerHTML += `message: ${info.data} <br>`
+            }
+        }
+
+    </script>
+</body>
+</html>
