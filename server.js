@@ -22,11 +22,11 @@ sockserver.on('connection', ws => {
     ws.clientNo = get_id();
     console.log('New connection: id = %s', ws.clientNo)
 
-    ws.registered_events = {}
+    registered_events = {}
 
     ws.on('close', () => console.log('Client has disconnected'))
 
-    handle_event('publish', ws, (ws, data) => {
+    handle_event('publish', (ws, data) => {
         if (ws.channel == null) {
             return;
         }
@@ -37,7 +37,7 @@ sockserver.on('connection', ws => {
         })
     })
 
-    handle_event('subscribe', ws, (ws, data) => {
+    handle_event('subscribe', (ws, data) => {
         ws.channel = data.channel;
     })
 
@@ -46,8 +46,8 @@ sockserver.on('connection', ws => {
         const command = info.command;
         const data = info.data;
 
-        if (command in ws.registered_events) {
-            ws.registered_events[command](ws, data);
+        if (command in registered_events) {
+            registered_events[command](ws, data);
         }
     })
 
@@ -56,8 +56,8 @@ sockserver.on('connection', ws => {
     }
 })
 
-function handle_event(event, ws, callback) {
-    ws.registered_events[event] = callback;
+function handle_event(event, callback) {
+    registered_events[event] = callback;
 }
 
 // generates a maximum of 1000 ids
