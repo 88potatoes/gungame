@@ -97,6 +97,18 @@ function parseJSON(json) {
 const tugsockserver = new WebSocketServer({ port: 8081})
 
 let pos = 10;
+let puller = null;
+let pusher = null;
+// const tugclients = [];
+
+function getClientString() {
+    let clientString = "";
+    for (let client of tugsockserver.clients) {
+        
+        clientString += client.clientNo + ' ';
+    }
+    return clientString;
+}
 
 function changeRopeLength(diff) {
     pos += diff;
@@ -105,8 +117,15 @@ function changeRopeLength(diff) {
 tugsockserver.on('connection', ws => {
     ws.clientNo = get_id();
     
-    
-    ws.on('close', () => { console.log('client disconnected'); })
+    // tugclients.push(ws);
+
+    ws.on('close', () => { 
+        console.log('client disconnected'); 
+
+        // removes client from tugclients 
+        // const index = tugclients.indexOf(ws)
+        // tugclients.splice(index, 1);
+    })
     
     ws.on('error', () => {
         console.log('logwebsocket error');
@@ -115,16 +134,6 @@ tugsockserver.on('connection', ws => {
     ws.on('message', (json) => {
         console.log("json", JSON.parse(json))
         const [command, data] = parseJSON(json);
-
-        // if (command == 'push') {
-        //     tugsockserver.clients.forEach((client) => {
-        //         sendJSON(client, {"command": "push", data: {"pos": pos}})
-        //     })
-        // } else if (command == 'pull') {
-        //     tugsockserver.clients.forEach((client) => {
-        //         sendJSON(client, {"command": "pull"})
-        //     })
-        // }
 
         if (command == 'push' || command == 'pull') {
             if (command == 'push') {
@@ -141,9 +150,54 @@ tugsockserver.on('connection', ws => {
             tugsockserver.clients.forEach(client => {
                 sendJSON(client, {command: "update", data: {"pos": pos}})
             })
+        } else if (command == 'setclient') {
+            if (data.field == 'puller') {
+                if (puller != null) {
+                    return;
+                }
+                if (ws.clientNo == pusher) {
+                    return;
+                }
+
+                puller = ws.clientNo;
+                tugsockserver.clients.forEach(client => {
+                    sendJSON(client, {"command": "setclient", data: {field: "puller", "clientNo": ws.clientNo }})
+                })
+            } else if (data.field == 'pusher') {
+                if (pusher != null) {
+                    return;
+                }
+                if (ws.clientNo == puller) {
+                    return;
+                }
+
+                pusher = ws.clientNo;
+                tugsockserver.clients.forEach(client => {
+                    sendJSON(client, {"command": "setclient", data: {"clientNo": ws.clientNo, field: "pusher"}})
+                })
+            } else if (data.field == 'spectator') {
+                if (puller == ws.clientNo) {
+                    puller = null;
+                    tugsockserver.clients.forEach(client => {
+                        sendJSON(client, {"command": "setclient", data: {"clientNo": -1, field: "puller"}})
+                    })
+                } else if (pusher == ws.clientNo) {
+                    pusher = null;
+                    tugsockserver.clients.forEach(client => {
+                        sendJSON(client, {"command": "setclient", data: {"clientNo": -1, field: "pusher"}})
+                    })
+                }
+            }
         }
 
     })
 
     sendJSON(ws, {"command": "update", "data": {"pos": pos}})
+    let clientString = getClientString();
+
+    tugsockserver.clients.forEach(client => {
+        sendJSON(client, {"command": "join", "data": {"clientString": clientString}})
+    })
+
+    sendJSON(ws, {"command": "setclient", "data": {"clientNo": ws.clientNo, "field": 'currentclient'}})
 })

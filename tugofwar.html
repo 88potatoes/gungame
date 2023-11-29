@@ -6,6 +6,7 @@
     <title>Tug of War</title>
     <link href="/dist/output.css" rel="stylesheet">
     <script src="/tugofwar.js" defer></script>
+    <meta name="google" content="notranslate">
 </head>
 <body class="h-screen flex flex-col items-center">
     <div class="bg-slate-100 flex flex-col">
@@ -16,6 +17,16 @@
         <button id="pushbutton">push</button>
         <button id="pullbutton">pull</button>
 
+    </div>
+    <div class="bg-slate-300 w-full">
+        <div id="thisclient" class="bg-slate-400 m-2 p-1 min-h-[4rem]"> </div>
+        <div id="pushertext">The pusher is: </div>
+        <div id="pullertext">The puller is: </div>
+        <button class="bg-slate-500 m-2 p-1 rounded-md" id="bepusher">be pusher</button>
+        <button class="bg-slate-500 m-2 p-1 rounded-md" id="bepuller">be puller</button>
+        <button class="bg-slate-500 m-2 p-1 rounded-md" id="bespectator">be spectator</button>
+        <p>In lobby:</p>
+        <div class="min-h-[4rem]" id="lobbypeeps"></div>
     </div>
 </body>
 </html>
