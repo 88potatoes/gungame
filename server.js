@@ -122,6 +122,21 @@ tugsockserver.on('connection', ws => {
     ws.on('close', () => { 
         console.log('client disconnected'); 
 
+        if (pusher == ws.clientNo) {
+            pusher = null;
+
+            tugsockserver.clients.forEach(client => {
+                sendJSON(client, {"command": "setclient", data: {field: "pusher", "clientNo": -1 }})
+            })
+        }
+        if (puller == ws.clientNo) {
+            puller = null;
+
+            tugsockserver.clients.forEach(client => {
+                sendJSON(client, {"command": "setclient", data: {field: "puller", "clientNo": -1 }})
+            })
+        }
+
         // removes client from tugclients 
         // const index = tugclients.indexOf(ws)
         // tugclients.splice(index, 1);
@@ -163,6 +178,8 @@ tugsockserver.on('connection', ws => {
                 tugsockserver.clients.forEach(client => {
                     sendJSON(client, {"command": "setclient", data: {field: "puller", "clientNo": ws.clientNo }})
                 })
+                sendJSON(ws, {"command": "activateButton", data: {event: "activate", role: "puller"}})
+
             } else if (data.field == 'pusher') {
                 if (pusher != null) {
                     return;
@@ -175,17 +192,21 @@ tugsockserver.on('connection', ws => {
                 tugsockserver.clients.forEach(client => {
                     sendJSON(client, {"command": "setclient", data: {"clientNo": ws.clientNo, field: "pusher"}})
                 })
+                sendJSON(ws, {"command": "activateButton", data: {event: "activate", role: "pusher"}})
             } else if (data.field == 'spectator') {
                 if (puller == ws.clientNo) {
                     puller = null;
                     tugsockserver.clients.forEach(client => {
                         sendJSON(client, {"command": "setclient", data: {"clientNo": -1, field: "puller"}})
                     })
+
+                    sendJSON(ws, {"command": "activateButton", data: {"event": "deactivate", role: "puller"}})
                 } else if (pusher == ws.clientNo) {
                     pusher = null;
                     tugsockserver.clients.forEach(client => {
                         sendJSON(client, {"command": "setclient", data: {"clientNo": -1, field: "pusher"}})
                     })
+                    sendJSON(ws, {"command": "activateButton", data: {"event": "deactivate", role: "pusher"}})
                 }
             }
         }
@@ -200,4 +221,6 @@ tugsockserver.on('connection', ws => {
     })
 
     sendJSON(ws, {"command": "setclient", "data": {"clientNo": ws.clientNo, "field": 'currentclient'}})
+    sendJSON(ws, {"command": "setclient", "data": {"clientNo": pusher == null ? -1 : pusher, "field": 'pusher'}})
+    sendJSON(ws, {"command": "setclient", "data": {"clientNo": puller == null ? -1 : puller, "field": 'puller'}})
 })

@@ -6,11 +6,17 @@ const pullertext = document.querySelector('#pullertext')
 const bepuller = document.querySelector('#bepuller')
 const bepusher = document.querySelector('#bepusher')
 const bespectator = document.querySelector('#bespectator')
+const pullbutton = document.querySelector('#pullbutton');
+const pushbutton = document.querySelector('#pushbutton');
 // rope.setAttribute('style', `width: ${pos}rem;`)
 
 function changeRopeLength(length, diff=null) {
     rope.setAttribute('style', `width: ${pos}rem;`);
 }
+
+pullbutton.style.display = "none"
+pushbutton.style.display = "none"
+
 
 const websocket = new WebSocket('ws://localhost:8081')
 
@@ -32,18 +38,29 @@ websocket.onmessage = (json) => {
         } else if (data.field == 'pusher') {
             pushertext.innerText = `The pusher is: ${data.clientNo == -1 ? '': data.clientNo}`
         }
+    } else if (command == 'activateButton') {
+        if (data.event == 'activate') {
+            if (data.role == 'puller') {
+                pullbutton.style.display = 'block'
+            } else if (data.role == 'pusher') {
+                pushbutton.style.display = 'block';
+            }
+        } else if (data.event == 'deactivate') {
+            if (data.role == 'puller') {
+                pullbutton.style.display = 'none'
+            } else if (data.role == 'pusher') {
+                pushbutton.style.display = 'none';
+            }
+        }
+        
     }
     
     
 }
 
-const pushbutton = document.querySelector('#pushbutton');
-
 pushbutton.addEventListener('click', () => {
     websocket.send(JSON.stringify({"command": "push"}))
 })
-
-const pullbutton = document.querySelector('#pullbutton');
 
 pullbutton.addEventListener('click', () => {
     websocket.send(JSON.stringify({"command": "pull"}))
