@@ -8,6 +8,9 @@ const bepusher = document.querySelector('#bepusher')
 const bespectator = document.querySelector('#bespectator')
 const pullbutton = document.querySelector('#pullbutton');
 const pushbutton = document.querySelector('#pushbutton');
+const startbutton = document.querySelector('#startbutton')
+const newgamebutton = document.querySelector('#newgamebutton')
+const noticeboard = document.querySelector('#noticeboard')
 // rope.setAttribute('style', `width: ${pos}rem;`)
 
 function changeRopeLength(length, diff=null) {
@@ -16,6 +19,8 @@ function changeRopeLength(length, diff=null) {
 
 pullbutton.style.display = "none"
 pushbutton.style.display = "none"
+newgamebutton.style.display = "none"
+// startbutton.style.display = "none"
 
 
 const websocket = new WebSocket('ws://localhost:8081')
@@ -44,15 +49,35 @@ websocket.onmessage = (json) => {
                 pullbutton.style.display = 'block'
             } else if (data.role == 'pusher') {
                 pushbutton.style.display = 'block';
+            } else if (data.role == 'startbutton') {
+                startbutton.style.display = 'block';
+            } else if (data.role == 'newgamebutton') {
+                newgamebutton.style.display = 'block';
             }
         } else if (data.event == 'deactivate') {
             if (data.role == 'puller') {
                 pullbutton.style.display = 'none'
             } else if (data.role == 'pusher') {
                 pushbutton.style.display = 'none';
+            } else if (data.role == 'startbutton') {
+                startbutton.style.display = 'none';
+            } else if (data.role == 'newgamebutton') {
+                newgamebutton.style.display = 'none';
             }
         }
         
+    } else if (command == 'notify') {
+        if (data.event == 'winner') {
+            if (data.value == 'puller') {
+                noticeboard.innerText = 'PULLER WON';
+            } else if (data.value == 'pusher') {
+                noticeboard.innerText = 'PUSHER WON';
+            }
+        } else if (data.event == 'clear') {
+            noticeboard.innerText = '';
+        } else if (data.event == 'doubledc') {
+            noticeboard.innerText = 'BOTH PLAYERS DISCONNECTED'
+        }
     }
     
     
@@ -76,6 +101,14 @@ bepusher.addEventListener('click', () => {
 
 bespectator.addEventListener('click', () => {
     sendJSON(websocket, {"command": "setclient", data: {"field": "spectator"}})
+})
+
+startbutton.addEventListener('click', () => {
+    sendJSON(websocket, {"command": "startgame"})
+})
+
+newgamebutton.addEventListener('click', () => {
+    sendJSON(websocket, {"command": "newgame"})
 })
 
 function sendJSON(ws, json) {
