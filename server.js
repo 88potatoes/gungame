@@ -14,8 +14,8 @@ const webserver = express()
 webserver.get('/dist/output.css', (req, res) => {
     res.sendFile('/dist/output.css', { root: __dirname });
 })
-webserver.get('/tugofwar.js', (req, res) => {
-    res.sendFile('/tugofwar.js', { root: __dirname });
+webserver.get('/dist/bundle.js', (req, res) => {
+    res.sendFile('/dist/bundle.js', { root: __dirname });
 })
 
 webserver.get('/', (req, res) => {
@@ -34,45 +34,45 @@ function get_id() {
     return id_generator.next().value;
 }
 
-const registered_events = {}
+// const registered_events = {}
 
-sockserver.on('connection', ws => {
-    ws.clientNo = get_id();
-    console.log('New connection: id = %s', ws.clientNo)
+// sockserver.on('connection', ws => {
+//     ws.clientNo = get_id();
+//     console.log('New connection: id = %s', ws.clientNo)
 
-    ws.on('close', () => console.log('Client has disconnected'))
+//     ws.on('close', () => console.log('Client has disconnected'))
 
-    handle_event('publish', (ws, data) => {
-        if (ws.channel == null) {
-            return;
-        }
-        sockserver.clients.forEach(client => {
-            if (client.channel == ws.channel) {
-                sendJSON(client, {"command": "publish", "data": data.message})
-            }
-        })
-    })
+//     handle_event('publish', (ws, data) => {
+//         if (ws.channel == null) {
+//             return;
+//         }
+//         sockserver.clients.forEach(client => {
+//             if (client.channel == ws.channel) {
+//                 sendJSON(client, {"command": "publish", "data": data.message})
+//             }
+//         })
+//     })
 
-    handle_event('subscribe', (ws, data) => {
-        ws.channel = data.channel;
-    })
+//     handle_event('subscribe', (ws, data) => {
+//         ws.channel = data.channel;
+//     })
 
-    ws.on('message', json => {
-        const [command, data] = parseJSON(json);
+//     ws.on('message', json => {
+//         const [command, data] = parseJSON(json);
 
-        if (command in registered_events) {
-            registered_events[command](ws, data);
-        }
-    })
+//         if (command in registered_events) {
+//             registered_events[command](ws, data);
+//         }
+//     })
 
-    ws.onerror = function () {
-        console.log('websocket error')
-    }
-})
+//     ws.onerror = function () {
+//         console.log('websocket error')
+//     }
+// })
 
-function handle_event(event, callback) {
-    registered_events[event] = callback;
-}
+// function handle_event(event, callback) {
+//     registered_events[event] = callback;
+// }
 
 // generates a maximum of 1000 ids
 function* create_id_generator() {

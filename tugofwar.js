@@ -1,5 +1,5 @@
 
-const { parseJSON, handle_event, update } = require('./ws-helpers.js');
+const { handle_event, parseJSON } = require('./ws-helpers.js');
 const rope = document.querySelector('#rope');
 const lobbypeeps = document.querySelector('#lobbypeeps');
 const thisclient = document.querySelector('#thisclient');
