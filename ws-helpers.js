@@ -10,6 +10,11 @@ function sendJSON(ws, ...messages) {
     }
 }
 
+function handle_event(event_dict, event, callback) {
+    event_dict[event] = callback;
+}
+
 module.exports = {
-    sendJSON
+    sendJSON,
+    handle_event
 }

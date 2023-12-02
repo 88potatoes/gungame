@@ -1,7 +1,7 @@
 const express = require('express');
 const { send } = require('vite');
 const { WebSocketServer } = require('ws')
-const { sendJSON } = require('./ws-helpers');
+const { sendJSON, handle_event } = require('./ws-helpers');
 
 let clientno = 0;
 
@@ -106,7 +106,7 @@ let pusher = null;
 let ingame = false;
 // const tugclients = [];
 
-const registered_events_tug = {}
+const tugsockevents = {}
 
 function handle_event_tug(event, callback) {
     registered_events_tug[event] = callback;
@@ -140,8 +140,10 @@ handle_event_tug('push', () => {
     if (pos == 20) {
         let winner = 'puller';
         tugsockserver.clients.forEach(client => {
-            sendJSON(client, {command: "notify", data: {"event": "winner", value: winner}})
-            sendJSON(client, {command: "activateButton", data: {"event": "activate", role: "newgamebutton"}})
+            sendJSON(client, 
+                {command: "notify", data: {"event": "winner", value: winner}},
+                {command: "activateButton", data: {"event": "activate", role: "newgamebutton"}}
+            )
         })
     }
 })
@@ -248,15 +250,13 @@ tugsockserver.on('connection', ws => {
 
         if (doubledc) {
             tugsockserver.clients.forEach(client => {
-                sendJSON(client, {"command": "notify", data: {event: "doubledc"}})
-                sendJSON(client, {command: "activateButton", data: {"event": "activate", role: "newgamebutton"}});
+                sendJSON(client, 
+                    {"command": "notify", data: {event: "doubledc"}},
+                    {command: "activateButton", data: {"event": "activate", role: "newgamebutton"}}
+                );
             })
 
         }
-        
-        // removes client from tugclients 
-        // const index = tugclients.indexOf(ws)
-        // tugclients.splice(index, 1);
     })
     
     ws.on('error', () => {
@@ -300,41 +300,24 @@ tugsockserver.on('connection', ws => {
         sendJSON(client, {"command": "join", "data": {"clientString": clientString}})
     })
 
-    sendJSONs(ws, {
-        "setclient": [
-            {"clientNo": ws.clientNo, "field": 'currentclient'},
-            {"clientNo": pusher == null ? -1 : pusher, "field" : 'pusher'},
-            {"clientNo": puller == null ? -1 : puller, "field": 'puller'}
-        ]
-    })
+    sendJSON(ws, 
+        { "command": "setclient", "data" : {"clientNo": ws.clientNo, "field": 'currentclient'}},
+        { "command": "setclient", "data" : {"clientNo": pusher == null ? -1 : pusher, "field" : 'pusher'}},
+        { "command": "setclient", "data" : {"clientNo": puller == null ? -1 : puller, "field": 'puller'}}
+    )
 
-    // sendJSON(ws, {"command": "setclient", "data": {"clientNo": ws.clientNo, "field": 'currentclient'}})
-    // sendJSON(ws, {"command": "setclient", "data": {"clientNo": pusher == null ? -1 : pusher, "field": 'pusher'}})
-    // sendJSON(ws, {"command": "setclient", "data": {"clientNo": puller == null ? -1 : puller, "field": 'puller'}})
     if (ingame) {
         sendJSON(ws, {command: "activateButton", data: {"event": "deactivate", "role": "startbutton"}})
     }
 })
 
+function isDoubleDC() {
+    return pusher == null && puller == null;
+}
+
 function startNewGame() {
     pos = 10;
     tugsockserver.clients.forEach(client => {
-        // sendJSONs(client, {
-        //     "update": {
-        //         "pos": pos
-        //     },
-        //     "activateButton": [
-        //         { "event": "activate", "role": "startbutton" },
-        //         { "event": "deactivate", "role": "newgamebutton" }
-        //     ],
-        //     "setclient": [
-        //         { "clientNo": -1, "field": "pusher" },
-        //         { "clientNo": -1, "field": "puller" }
-        //     ],
-        //     "notify": {
-        //         "event": "clear"
-        //     }
-        // })
 
         sendJSONs(client, 
             {command: "update", data: {"pos": pos}},
@@ -344,18 +327,6 @@ function startNewGame() {
             {"command": "setclient", data: {"clientNo": -1, field: "puller"}},
             {command: "notify", data: {"event": "clear"}},
         )
-        // sendJSON(client, {command: "update", data: {"pos": pos}})
-        // sendJSON(client, {command: "activateButton", data: {"event": "activate", "role": "startbutton"}})
-        // sendJSON(client, {command: "activateButton", data: {"event": "deactivate", "role": "newgamebutton"}})
-        // sendJSON(client, {"command": "setclient", data: {"clientNo": -1, field: "pusher"}})
-        // sendJSON(client, {"command": "setclient", data: {"clientNo": -1, field: "puller"}})
-        // sendJSON(client, {command: "notify", data: {"event": "clear"}})
-
-        // if (puller == client.clientNo) {
-        //     sendJSON(client, {command: "activateButton", data: {"event": "deactivate", "role": "puller"}})
-        // } else if (pusher == client.clientNo) {
-        //     sendJSON(client, {command: "activateButton", data: {"event": "deactivate", "role": "pusher"}})
-        // }
     })
 
     puller = null;
