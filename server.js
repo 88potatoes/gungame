@@ -1,6 +1,7 @@
 const express = require('express');
 const { send } = require('vite');
 const { WebSocketServer } = require('ws')
+const { sendJSON } = require('./ws-helpers');
 
 let clientno = 0;
 
@@ -80,10 +81,6 @@ function* create_id_generator() {
         yield i;
         i++;
     }
-}
-
-function sendJSON(client, json) {
-    client.send(JSON.stringify(json))
 }
 
 function parseJSON(json) {
@@ -322,22 +319,31 @@ tugsockserver.on('connection', ws => {
 function startNewGame() {
     pos = 10;
     tugsockserver.clients.forEach(client => {
-        sendJSONs(client, {
-            "update": {
-                "pos": pos
-            },
-            "activateButton": [
-                { "event": "activate", "role": "startbutton" },
-                { "event": "deactivate", "role": "newgamebutton" }
-            ],
-            "setclient": [
-                { "clientNo": -1, "field": "pusher" },
-                { "clientNo": -1, "field": "puller" }
-            ],
-            "notify": {
-                "event": "clear"
-            }
-        })
+        // sendJSONs(client, {
+        //     "update": {
+        //         "pos": pos
+        //     },
+        //     "activateButton": [
+        //         { "event": "activate", "role": "startbutton" },
+        //         { "event": "deactivate", "role": "newgamebutton" }
+        //     ],
+        //     "setclient": [
+        //         { "clientNo": -1, "field": "pusher" },
+        //         { "clientNo": -1, "field": "puller" }
+        //     ],
+        //     "notify": {
+        //         "event": "clear"
+        //     }
+        // })
+
+        sendJSONs(client, 
+            {command: "update", data: {"pos": pos}},
+            {command: "activateButton", data: {"event": "activate", "role": "startbutton"}},
+            {command: "activateButton", data: {"event": "deactivate", "role": "newgamebutton"}},
+            {"command": "setclient", data: {"clientNo": -1, field: "pusher"}},
+            {"command": "setclient", data: {"clientNo": -1, field: "puller"}},
+            {command: "notify", data: {"event": "clear"}},
+        )
         // sendJSON(client, {command: "update", data: {"pos": pos}})
         // sendJSON(client, {command: "activateButton", data: {"event": "activate", "role": "startbutton"}})
         // sendJSON(client, {command: "activateButton", data: {"event": "deactivate", "role": "newgamebutton"}})
@@ -354,19 +360,4 @@ function startNewGame() {
 
     puller = null;
     pusher = null;
-}
-
-function sendJSONs(ws, messages) {
-    for (let message of Object.entries(messages)) {
-        const command = message[0];
-        const datas = message[1]
-
-        if (datas instanceof Array) {
-            for (let data of datas) {
-                sendJSON(ws, {"command": command, "data": data});
-            }
-        } else {
-            sendJSON(ws, {"command": command, "data": datas})
-        }
-    }
 }
