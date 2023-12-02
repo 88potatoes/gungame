@@ -121,15 +121,7 @@ function getClientString() {
     return clientString;
 }
 
-function changeRopeLength(diff) {
-    pos += diff;
-}
-
-function send_init_state(ws) {
-    sendJSON
-}
-
-handle_event_tug('push', () => {
+handle_event(tugsockevents, 'push', () => {
     if (!ingame) {
         return;
     }
@@ -148,7 +140,7 @@ handle_event_tug('push', () => {
     }
 })
 
-handle_event_tug('pull', () => {
+handle_event(tugsockevents, 'pull', () => {
     if (!ingame) {
         return;
     }
@@ -165,7 +157,7 @@ handle_event_tug('pull', () => {
     }
 })
 
-handle_event_tug('setclient', (ws, data) => {
+handle_event(tugsockevents, 'setclient', (ws, data) => {
     if (data.field == 'puller') {
         if (puller != null) {
             return;
@@ -211,11 +203,40 @@ handle_event_tug('setclient', (ws, data) => {
     }
 })
 
-tugsockserver.on('connection', ws => {
-    ws.clientNo = get_id();
+handle_event('startgame', (ws) => {
+    if (ingame) {
+        return;
+    }
+    if (puller == null || pusher == null) {
+        return;
+    }
     
-    // tugclients.push(ws);
+    tugsockserver.clients.forEach(client => {
+        sendJSON(ws, {command: "activateButton", data: {"event": "deactivate", "role": "startbutton"}})
+    })
 
+    ingame = true;
+})
+
+handle_event('newgame', () => {
+    pos = 10;
+    tugsockserver.clients.forEach(client => {
+
+        sendJSON(client, 
+            {command: "update", data: {"pos": pos}},
+            {command: "activateButton", data: {"event": "activate", "role": "startbutton"}},
+            {command: "activateButton", data: {"event": "deactivate", "role": "newgamebutton"}},
+            {"command": "setclient", data: {"clientNo": -1, field: "pusher"}},
+            {"command": "setclient", data: {"clientNo": -1, field: "puller"}},
+            {command: "notify", data: {"event": "clear"}},
+        )
+    })
+
+    puller = null;
+    pusher = null;
+})
+
+tugsockserver.on('connection', ws => {
     ws.on('close', () => { 
         console.log('client disconnected'); 
 
@@ -267,33 +288,18 @@ tugsockserver.on('connection', ws => {
         console.log("json", JSON.parse(json))
         const [command, data] = parseJSON(json);
 
-        if (command in registered_events_tug) {
-            registered_events_tug[command](ws, data);
+        if (command in tugsockevents) {
+            tugsockevents[command](ws, data);
         }
 
-            if (command == 'startgame') {
-            if (ingame) {
-                return;
-            }
-            if (puller == null || pusher == null) {
-                return;
-            }
-            
-            tugsockserver.clients.forEach(client => {
-                sendJSON(client, {command: "activateButton", data: {"event": "deactivate", "role": "startbutton"}})
-            })
-
-            ingame = true;
-
-
-        } else if (command == 'newgame') {
+        if (command == 'newgame') {
 
             startNewGame();
         }
 
     })
 
-    sendJSON(ws, {"command": "update", "data": {"pos": pos}})
+    ws.clientNo = get_id();
     let clientString = getClientString();
 
     tugsockserver.clients.forEach(client => {
@@ -303,7 +309,8 @@ tugsockserver.on('connection', ws => {
     sendJSON(ws, 
         { "command": "setclient", "data" : {"clientNo": ws.clientNo, "field": 'currentclient'}},
         { "command": "setclient", "data" : {"clientNo": pusher == null ? -1 : pusher, "field" : 'pusher'}},
-        { "command": "setclient", "data" : {"clientNo": puller == null ? -1 : puller, "field": 'puller'}}
+        { "command": "setclient", "data" : {"clientNo": puller == null ? -1 : puller, "field": 'puller'}},
+        {"command": "update", "data": {"pos": pos}}
     )
 
     if (ingame) {
@@ -313,22 +320,4 @@ tugsockserver.on('connection', ws => {
 
 function isDoubleDC() {
     return pusher == null && puller == null;
-}
-
-function startNewGame() {
-    pos = 10;
-    tugsockserver.clients.forEach(client => {
-
-        sendJSONs(client, 
-            {command: "update", data: {"pos": pos}},
-            {command: "activateButton", data: {"event": "activate", "role": "startbutton"}},
-            {command: "activateButton", data: {"event": "deactivate", "role": "newgamebutton"}},
-            {"command": "setclient", data: {"clientNo": -1, field: "pusher"}},
-            {"command": "setclient", data: {"clientNo": -1, field: "puller"}},
-            {command: "notify", data: {"event": "clear"}},
-        )
-    })
-
-    puller = null;
-    pusher = null;
 }
