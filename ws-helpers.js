@@ -22,8 +22,23 @@ function parseJSON(json) {
     return [command, data];
 }
 
+function* create_id_generator() {
+    let i = 0;
+    while (i < 1000) {
+        yield i;
+        i++;
+    }
+}
+
+const id_generator = create_id_generator();
+
+function get_id() {
+    return id_generator.next().value;
+}
+
 module.exports = {
     sendJSON,
     handle_event,
-    parseJSON
+    parseJSON,
+    get_id
 }
