@@ -15,7 +15,7 @@ function gungameserver() {
         current_player.x -= SPEED;
 
         websocketserver.clients.forEach((client) => {
-            sendJSON(client, {command: "move-hor", data: {posx: current_player.x}})
+            sendJSON(client, {command: "move-hor", data: {player: ws.id, x: current_player.x}})
         });
     })
 
@@ -24,7 +24,7 @@ function gungameserver() {
         current_player.x += SPEED;
 
         websocketserver.clients.forEach((client) => {
-            sendJSON(client, {command: "move-hor", data: {posx: current_player.x}})
+            sendJSON(client, {command: "move-hor", data: {player: ws.id, x: current_player.x}})
         });
     })
 
@@ -33,7 +33,7 @@ function gungameserver() {
         current_player.y -= SPEED;
 
         websocketserver.clients.forEach((client) => {
-            sendJSON(client, {command: "move-ver", data: {posy: current_player.y}})
+            sendJSON(client, {command: "move-ver", data: { player: ws.id, y: current_player.y}})
         });
     })
 
@@ -42,17 +42,25 @@ function gungameserver() {
         current_player.y += SPEED;
 
         websocketserver.clients.forEach((client) => {
-            sendJSON(client, {command: "move-ver", data: {posy: current_player.y}})
+            sendJSON(client, {command: "move-ver", data: {player: ws.id, y: current_player.y}})
         });
     })
 
     websocketserver.on('connection', (ws) => {
         console.log('connected');
         ws.id = get_id();
-        players[ws.id] = new Player();
+        players[ws.id] = new Player(ws.id);
+        console.log(players)
+
+        // send all player data
+        sendJSON(ws, {command: "init_players", data: players});
+        for (let client of websocketserver.clients) {
+            console.log('sending', {[ws.id]: players[ws.id]})
+            sendJSON(client, {command: "add_player", data: {[ws.id]: players[ws.id]}})
+        }
 
         ws.onclose = () => {
-
+            delete players[ws.id]
         }
 
         ws.onerror = () => {
