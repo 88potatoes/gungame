@@ -1,12 +1,5 @@
 const canvas = document.getElementById('canv');
-const element = document.createElement('div');
 const { sendJSON, handle_event, parseJSON } = require('../ws-helpers.js')
-canvas.appendChild(element)
-let posx = 10;
-let posy = 60;
-element.style = "position: absolute; background: red; width: 50px; height: 50px;"
-element.style.left = `${posx}px`;
-element.style.top = `${posy}px`;
 let goup = false;
 let godown = false;
 let goright = false;
@@ -30,12 +23,12 @@ websocket.onmessage = (event) => {
 // initialise all players initially
 handle_event(registered_events, 'init_players', (data) => {
     players = data;
-    // console.log(players)
+    console.log("init players", Object.values(players))
 
     for (let player of Object.values(players)) {
-        // console.log(player)
+        console.log(player)
         let playerEl = document.createElement('div');
-        playerEl.style = "position: absolute; background: red; width: 50px; height: 50px;";
+        playerEl.style = "position: absolute; background: blue; width: 50px; height: 50px;";
         playerEl.style.left = `${player.x}px`
         playerEl.style.top = `${player.y}px`
         playerElements[player.id] = playerEl;
@@ -45,35 +38,29 @@ handle_event(registered_events, 'init_players', (data) => {
 
 // add a new player upon connection
 handle_event(registered_events, 'add_player', (data) => {
-    console.log('another player connected', Object.values(data)[0])
     const player = Object.values(data)[0];
-    // console.log('playerElements', playerElements)
     players = {...players, [player.id]: player }
-
-    // console.log(players)
-    // console.log(data)
-    console.log(players)
+    console.log("players", players)
 
     let playerEl = document.createElement('div');
     playerEl.style = "position: absolute; background: red; width: 50px; height: 50px;";
     playerEl.style.left = `${player.x}px`
     playerEl.style.top = `${player.y}px`
-
-    console.log('playerElements', playerElements)
-    // console.log('playerElements', playerE)
-    console.log('player', player)
+    playerEl.id = `p${player.id}`
     playerElements[player.id] = playerEl;
     canvas.appendChild(playerElements[player.id]);
 })
 
+//handle disconnect event
+handle_event(registered_events, 'disconnect', (data) => {
+    delete players[data.player]
+    canvas.removeChild(playerElements[data.player])
+    delete playerElements[data.player]
+})
+
 handle_event(registered_events, 'move-hor', (data) => {
-    console.log('players: ', players)
-    console.log('move-hordata', data)
-    // console.log('player:', data.player)
     players[data.player].x = data.x;
-    console.log(playerElements, data, data.player)
     playerElements[data.player].style.left = `${data.x}px`;
-    
 })
 
 handle_event(registered_events, 'move-ver', (data) => {
@@ -144,13 +131,8 @@ function update() {
 }
 
 function render() {
-    element.style.top = `${posy}px`;
-    element.style.left = `${posx}px`;
+    //skip
 }
-
-// websocket.onopen = () => {
-//     console.log('established connection');
-// }
 
 class Player {
     constructor(id) {

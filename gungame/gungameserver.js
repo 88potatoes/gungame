@@ -61,6 +61,9 @@ function gungameserver() {
 
         ws.onclose = () => {
             delete players[ws.id]
+            websocketserver.clients.forEach((client) => {
+                sendJSON(client, {command: "disconnect", data: {player: ws.id}})
+            })
         }
 
         ws.onerror = () => {
