@@ -47,19 +47,18 @@ function gungameserver() {
     })
 
     websocketserver.on('connection', (ws) => {
-        console.log('connected');
         ws.id = get_id();
-        players[ws.id] = new Player(ws.id);
-        console.log(players)
-
+        console.log('connected', ws.id);
         // send all player data
         sendJSON(ws, {command: "init_players", data: players});
+        
+        players[ws.id] = new Player(ws.id);
         for (let client of websocketserver.clients) {
-            console.log('sending', {[ws.id]: players[ws.id]})
             sendJSON(client, {command: "add_player", data: {[ws.id]: players[ws.id]}})
         }
 
         ws.onclose = () => {
+            console.log('disconnected', ws.id)
             delete players[ws.id]
             websocketserver.clients.forEach((client) => {
                 sendJSON(client, {command: "disconnect", data: {player: ws.id}})

@@ -114,19 +114,15 @@ const vel = 6;
 function update() {
     if (goup) {
         sendJSON(websocket, {command: "move-up"})
-        console.log('move-up')
     }
     if (godown) {
         sendJSON(websocket, {command: "move-down"})
-        console.log('move-down')
     }
     if (goleft) {
         sendJSON(websocket, {command: "move-left"})
-        console.log('move-left')
     }
     if (goright) {
         sendJSON(websocket, {command: "move-right"})
-        console.log('move-right')
     }
 }
 
