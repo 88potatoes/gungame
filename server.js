@@ -26,9 +26,9 @@ webserver.get('/gungame.js', (req, res) => {
 })
 
 
-webserver.get('/static/dead.png', (req, res) => {
-    res.sendFile('./static/dead.png', { root: __dirname })
-})
+// webserver.get('/static/dead.png', (req, res) => {
+//     res.sendFile('./static/dead.png', { root: __dirname })
+// })
 webserver.listen(8080, console.log(`Listening on port ${8080}`))
 
 const sockserver = tugofwarserver();
