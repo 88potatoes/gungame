@@ -1,5 +1,6 @@
 const express = require('express');
 const { tugofwarserver } = require('./tugwar');
+const { gungameserver } = require('./gungame/gungameserver');
 
 const webserver = express()
 
@@ -17,9 +18,22 @@ webserver.get('/tugofwar', (req, res) => {
     res.sendFile('/tugofwar.html', { root: __dirname })
 })
 
+webserver.get('/gungame', (req, res) => {
+    res.sendFile('/gungame/gungame.html', { root: __dirname })
+})
+webserver.get('/gungame/gungame.js', (req, res) => {
+    res.sendFile('/gungame/gungame.js', { root: __dirname })
+})
+
+
+webserver.get('/static/dead.png', (req, res) => {
+    res.sendFile('./static/dead.png', { root: __dirname })
+})
 webserver.listen(8080, console.log(`Listening on port ${8080}`))
 
 const sockserver = tugofwarserver();
+
+const gungame = gungameserver();
 
 // const registered_events = {}
 

@@ -3,13 +3,10 @@ const { sendJSON, handle_event, get_id } = require('./ws-helpers');
 
 function tugofwarserver() {
     const tugsockserver = new WebSocketServer({ port: 8081 })
-
     let pos = 10;
     let puller = null;
     let pusher = null;
     let ingame = false;
-    // const tugclients = [];
-
     const tugsockevents = {}
 
     function getClientString() {
