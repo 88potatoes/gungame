@@ -21,8 +21,8 @@ webserver.get('/tugofwar', (req, res) => {
 webserver.get('/gungame', (req, res) => {
     res.sendFile('/gungame/gungame.html', { root: __dirname })
 })
-webserver.get('/gungame/gungame.js', (req, res) => {
-    res.sendFile('/gungame/gungame.js', { root: __dirname })
+webserver.get('/gungame.js', (req, res) => {
+    res.sendFile('./dist/gungame.js', { root: __dirname })
 })
 
 
@@ -33,7 +33,7 @@ webserver.listen(8080, console.log(`Listening on port ${8080}`))
 
 const sockserver = tugofwarserver();
 
-const gungame = gungameserver();
+gungameserver();
 
 // const registered_events = {}
 
