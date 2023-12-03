@@ -12,7 +12,7 @@ function gungameserver() {
 
     handle_event(registered_events, 'move-left', (ws) => {
         current_player = players[ws.id];
-        current_player.x -= SPEED;
+        current_player.x = max(0, current_player.x - SPEED)
 
         websocketserver.clients.forEach((client) => {
             sendJSON(client, {command: "move-hor", data: {player: ws.id, x: current_player.x}})
@@ -21,7 +21,7 @@ function gungameserver() {
 
     handle_event(registered_events, 'move-right', (ws) => {
         current_player = players[ws.id];
-        current_player.x += SPEED;
+        current_player.x = min(640 - current_player.width, current_player.x + SPEED);
 
         websocketserver.clients.forEach((client) => {
             sendJSON(client, {command: "move-hor", data: {player: ws.id, x: current_player.x}})
@@ -30,7 +30,7 @@ function gungameserver() {
 
     handle_event(registered_events, 'move-up', (ws) => {
         current_player = players[ws.id];
-        current_player.y -= SPEED;
+        current_player.y = max(0, current_player.y - SPEED);
 
         websocketserver.clients.forEach((client) => {
             sendJSON(client, {command: "move-ver", data: { player: ws.id, y: current_player.y}})
@@ -39,7 +39,7 @@ function gungameserver() {
 
     handle_event(registered_events, 'move-down', (ws) => {
         current_player = players[ws.id];
-        current_player.y += SPEED;
+        current_player.y = min(640 - current_player.width, current_player.y + SPEED);
 
         websocketserver.clients.forEach((client) => {
             sendJSON(client, {command: "move-ver", data: {player: ws.id, y: current_player.y}})
@@ -83,10 +83,18 @@ class Player {
     constructor(id) {
         this.x = 0;
         this.y = 0;
-        this.width = 10;
-        this.height = 10;
+        this.width = 50;
+        this.height = 50;
         this.id = id;
     }
+}
+
+function max(a, b) {
+    return a < b ? b : a;
+}
+
+function min(a, b) {
+    return a < b ? a : b;
 }
 
 module.exports = { gungameserver };

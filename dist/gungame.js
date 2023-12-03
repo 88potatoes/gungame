@@ -44,9 +44,7 @@ handle_event(registered_events, 'add_player', (data) => {
     console.log("players", players)
 
     let playerEl = document.createElement('div');
-    playerEl.style = "position: absolute; background: red; width: 50px; height: 50px;";
-    playerEl.style.left = `${player.x}px`
-    playerEl.style.top = `${player.y}px`
+    playerEl.style = `position: absolute; background: red; width: ${player.width}px; height: ${player.height}px; left: ${player.x}px; top: ${player.y}px;`;
     playerEl.id = `p${player.id}`
     playerElements[player.id] = playerEl;
     canvas.appendChild(playerElements[player.id]);
