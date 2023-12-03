@@ -7,16 +7,16 @@ const webserver = express()
 webserver.get('/dist/output.css', (req, res) => {
     res.sendFile('/dist/output.css', { root: __dirname });
 })
-webserver.get('/dist/bundle.js', (req, res) => {
-    res.sendFile('/dist/bundle.js', { root: __dirname });
-})
+// webserver.get('/dist/bundle.js', (req, res) => {
+//     res.sendFile('/dist/bundle.js', { root: __dirname });
+// })
 
 webserver.get('/', (req, res) => {
     res.sendFile('/websocket-client.html', { root: __dirname })
 })
-webserver.get('/tugofwar', (req, res) => {
-    res.sendFile('/tugofwar.html', { root: __dirname })
-})
+// webserver.get('/tugofwar', (req, res) => {
+//     res.sendFile('/tugofwar.html', { root: __dirname })
+// })
 
 webserver.get('/gungame', (req, res) => {
     res.sendFile('/gungame/gungame.html', { root: __dirname })
