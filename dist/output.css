@@ -814,6 +814,10 @@ video {
   height: 100vh;
 }
 
+.h-\[80vw\] {
+  height: 80vw;
+}
+
 .min-h-\[4rem\] {
   min-height: 4rem;
 }
@@ -836,6 +840,10 @@ video {
 
 .w-full {
   width: 100%;
+}
+
+.w-\[80vw\] {
+  width: 80vw;
 }
 
 .flex-shrink {
