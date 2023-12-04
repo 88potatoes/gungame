@@ -12,6 +12,7 @@ const registered_events = {}
 let players = {}
 let playerElements = {}
 let bullets = {}
+let bulletElements = {}
 
 
 websocket.onmessage = (event) => {
@@ -67,9 +68,23 @@ handle_event(registered_events, 'move-ver', (data) => {
 })
 
 handle_event(registered_events, 'init_bullet', (data) => {
-    console.log(data)
+    // console.log(data)
+    let current_bullet = data;
     bullets[data.id] = data;
-    console.log(bullets)
+    // console.log(bullets)
+
+    let bulletElement = document.createElement('div')
+    bulletElement.style = `position: absolute; background: green; width: ${current_bullet.radius}px; height: ${current_bullet.radius}px; left: ${current_bullet.x}px; top: ${current_bullet.y}px;` 
+
+    bulletElements[data.id] = bulletElement;
+    canvas.appendChild(bulletElements[data.id]);
+})
+
+handle_event(registered_events, 'update_bullet', (data) => {
+    bullets[data.id].x = data.x;
+    bullets[data.id].y = data.y;
+    bulletElements[data.id].style.left = `${data.x}px`;
+    bulletElements[data.id].style.top = `${data.y}px`;
 })
 
 canvas.addEventListener('mousedown', (e) => {

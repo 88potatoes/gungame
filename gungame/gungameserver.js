@@ -3,6 +3,8 @@ const { handle_event, get_id, parseJSON, sendJSON } = require('../ws-helpers');
 
 function gungameserver() {
     const SPEED = 5;
+    const BULLET_SPEED = 10;
+    const FPS = 60;
 
     console.log('run gungameserver')
     const websocketserver = new WebSocketServer({ port: 8082 });
@@ -96,7 +98,12 @@ function gungameserver() {
     })
 
     handle_event(registered_events, 'shoot', (ws, data) => {
-        bullets[bullet_id] = new Bullet(bullet_id, data.x, data.y);
+        let dx = data.x - players[ws.id].x;
+        let dy = data.y - players[ws.id].y;
+        let d = Math.sqrt(dx*dx + dy*dy)
+        let velx = dx/d * BULLET_SPEED;
+        let vely = dy/d * BULLET_SPEED;
+        bullets[bullet_id] = new Bullet(bullet_id, players[ws.id].x, players[ws.id].y, velx, vely);
         sendJSON(ws, {command: 'init_bullet', data: bullets[bullet_id]})
 
         bullet_id++;
@@ -133,6 +140,27 @@ function gungameserver() {
             }
         }
     })
+
+    function update() {
+        for (let bullet of Object.values(bullets)) {
+            if (bullet.x > 640 || bullet.x < 0 || bullet.y > 640 || bullet.y < 0) {
+                delete bullets[bullet.id];
+                continue;
+            }
+
+            bullet.x += bullet.velx;
+            bullet.y += bullet.vely;
+            websocketserver.clients.forEach((client) => {
+                sendJSON(client, {command: "update_bullet", data: {id: bullet.id, x: bullet.x, y: bullet.y}})
+            })
+        }
+    }
+    
+    function run() {
+        setInterval(update, 1000 / FPS)
+    }
+
+    run();
 }
 
 class Player {
@@ -146,11 +174,13 @@ class Player {
 }
 
 class Bullet {
-    constructor(id, x, y) {
+    constructor(id, x, y, velx, vely) {
         this.x = x;
         this.y = y;
         this.radius = 4;
         this.id = id;
+        this.velx = velx;
+        this.vely = vely;
     }
 }
 
