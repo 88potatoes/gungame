@@ -1,6 +1,7 @@
 const express = require('express');
 const { tugofwarserver } = require('./tugwar');
 const { gungameserver } = require('./gungame/gungameserver');
+const useragent = require('express-useragent')
 
 const webserver = express()
 
@@ -19,7 +20,18 @@ webserver.get('/', (req, res) => {
 // })
 
 webserver.get('/gungame', (req, res) => {
-    res.sendFile('/gungame/gungame.html', { root: __dirname })
+    const source = req.headers['user-agent']
+    console.log(`source: ${source}`)
+    const ua = useragent.parse(source);
+    console.log(`ua: ${ua}`)
+    const isMobile = ua.isMobile;
+    console.log(`isMobile: ${isMobile}`)
+
+    if (isMobile) {
+        res.sendFile('/gungame/gungamecontroller.html', { root: __dirname })
+    } else {
+        res.sendFile('/gungame/gungame.html', { root: __dirname })
+    }
 })
 webserver.get('/gungame.js', (req, res) => {
     res.sendFile('./dist/gungame.js', { root: __dirname })

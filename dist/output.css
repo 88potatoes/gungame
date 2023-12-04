@@ -798,6 +798,10 @@ video {
   height: 2rem;
 }
 
+.h-\[10rem\] {
+  height: 10rem;
+}
+
 .h-\[40rem\] {
   height: 40rem;
 }
@@ -808,14 +812,6 @@ video {
 
 .h-screen {
   height: 100vh;
-}
-
-.h-16 {
-  height: 4rem;
-}
-
-.h-\[10rem\] {
-  height: 10rem;
 }
 
 .min-h-\[4rem\] {
@@ -830,20 +826,16 @@ video {
   width: 20rem;
 }
 
+.w-\[30rem\] {
+  width: 30rem;
+}
+
 .w-\[40rem\] {
   width: 40rem;
 }
 
 .w-full {
   width: 100%;
-}
-
-.w-32 {
-  width: 8rem;
-}
-
-.w-\[30rem\] {
-  width: 30rem;
 }
 
 .flex-shrink {
