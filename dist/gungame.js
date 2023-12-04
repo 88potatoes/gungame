@@ -11,6 +11,7 @@ const websocket = new WebSocket('ws://localhost:8082')
 const registered_events = {}
 let players = {}
 let playerElements = {}
+let bullets = {}
 
 
 websocket.onmessage = (event) => {
@@ -65,6 +66,12 @@ handle_event(registered_events, 'move-ver', (data) => {
     playerElements[data.player].style.top = `${data.y}px`;
 })
 
+handle_event(registered_events, 'init_bullet', (data) => {
+    console.log(data)
+    bullets[data.id] = data;
+    console.log(bullets)
+})
+
 canvas.addEventListener('mousedown', (e) => {
     let boundingRect = canvas.getBoundingClientRect();
 
@@ -116,7 +123,6 @@ const loop = () => {
 
 window.requestAnimationFrame(loop)
 
-const vel = 6;
 function update() {
     if (goup) {
         sendJSON(websocket, {command: "move-up"})

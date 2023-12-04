@@ -8,7 +8,10 @@ function gungameserver() {
     const websocketserver = new WebSocketServer({ port: 8082 });
 
     const players = {}
+    const bullets = {}
     const registered_events = {}
+
+    let bullet_id = 0;
 
     handle_event(registered_events, 'move-left', (ws) => {
         current_player = players[ws.id];
@@ -92,8 +95,11 @@ function gungameserver() {
         });
     })
 
-    handle_event('shoot', (ws, data) => {
+    handle_event(registered_events, 'shoot', (ws, data) => {
+        bullets[bullet_id] = new Bullet(bullet_id, data.x, data.y);
+        sendJSON(ws, {command: 'init_bullet', data: bullets[bullet_id]})
 
+        bullet_id++;
     })
 
     websocketserver.on('connection', (ws) => {
@@ -140,9 +146,9 @@ class Player {
 }
 
 class Bullet {
-    constructor(id) {
-        this.x = 0;
-        this.y = 0;
+    constructor(id, x, y) {
+        this.x = x;
+        this.y = y;
         this.radius = 4;
         this.id = id;
     }
