@@ -13,6 +13,12 @@ function gungameserver() {
     const bullets = {}
     const registered_events = {}
     const desktops = {}
+    const walls = [
+        new SquareBlock(80, 80, 80),
+        new SquareBlock(240, 80, 80),
+        new SquareBlock(80, 240, 80),
+        new SquareBlock(240, 240, 80)
+    ]
 
     let bullet_id = 0;
 
@@ -127,6 +133,7 @@ function gungameserver() {
         desktops[ws.id] = ws;
         // send all player data
         sendJSON(ws, {command: "init_players", data: players});
+        sendJSON(ws, {command: "init_walls", data: walls});
     })
 
     websocketserver.on('connection', (ws) => {
@@ -219,6 +226,14 @@ class Player {
         this.height = 50;
         this.id = id;
         this.hp = 10;
+    }
+}
+
+class SquareBlock {
+    constructor(x, y, sideLength) {
+        this.x = x;
+        this.y = y;
+        this.sideLength = sideLength;
     }
 }
 

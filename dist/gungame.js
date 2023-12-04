@@ -20,6 +20,7 @@ let playerElements = {}
 let bullets = {}
 let bulletElements = {}
 let lobbyElements = {}
+// let wallElements = []
 
 websocket.onopen = () => {
     sendJSON(websocket, {command: "desktop_join"})
@@ -122,6 +123,16 @@ handle_event(registered_events, 'delete_bullet', (data) => {
 
 handle_event(registered_events, 'alert', (data) => {
     alert(data.message)
+})
+
+handle_event(registered_events, 'init_walls', (data) => {
+    for (let wall of data) {
+        let wallElement = document.createElement('div')
+        wallElement.style = `position: absolute; background: blue; width: ${wall.sideLength}px; height: ${wall.sideLength}px; left: ${wall.x}px; top: ${wall.y}px;`
+        canvas.appendChild(wallElement)
+    }
+
+
 })
 
 },{"../info.json":2,"../ws-helpers.js":3}],2:[function(require,module,exports){
