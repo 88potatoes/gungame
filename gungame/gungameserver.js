@@ -104,7 +104,9 @@ function gungameserver() {
         let velx = dx/d * BULLET_SPEED;
         let vely = dy/d * BULLET_SPEED;
         bullets[bullet_id] = new Bullet(bullet_id, players[ws.id].x, players[ws.id].y, velx, vely);
-        sendJSON(ws, {command: 'init_bullet', data: bullets[bullet_id]})
+        websocketserver.clients.forEach((client) => {
+            sendJSON(client, {command: 'init_bullet', data: bullets[bullet_id]})
+        })
 
         bullet_id++;
     })
