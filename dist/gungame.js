@@ -29,9 +29,7 @@ handle_event(registered_events, 'init_players', (data) => {
     for (let player of Object.values(players)) {
         console.log(player)
         let playerEl = document.createElement('div');
-        playerEl.style = "position: absolute; background: blue; width: 50px; height: 50px;";
-        playerEl.style.left = `${player.x}px`
-        playerEl.style.top = `${player.y}px`
+        playerEl.style = `position: absolute; background: red; width: ${player.width}px; height: ${player.height}px; left: ${player.x}px; top: ${player.y}px;`;
         playerElements[player.id] = playerEl;
         canvas.appendChild(playerElements[player.id]);
     }
@@ -65,6 +63,15 @@ handle_event(registered_events, 'move-hor', (data) => {
 handle_event(registered_events, 'move-ver', (data) => {
     players[data.player].y = data.y
     playerElements[data.player].style.top = `${data.y}px`;
+})
+
+canvas.addEventListener('mousedown', (e) => {
+    let boundingRect = canvas.getBoundingClientRect();
+
+    let divx = e.clientX - boundingRect.left;
+    let divy = e.clientY - boundingRect.top;
+
+    sendJSON(websocket, {command: "shoot", data: {x: divx, y: divy}})
 })
 
 document.addEventListener('keydown', (event) => {

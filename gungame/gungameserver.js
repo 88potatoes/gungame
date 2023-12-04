@@ -92,6 +92,10 @@ function gungameserver() {
         });
     })
 
+    handle_event('shoot', (ws, data) => {
+
+    })
+
     websocketserver.on('connection', (ws) => {
         ws.id = get_id();
         console.log('connected', ws.id);
@@ -131,6 +135,15 @@ class Player {
         this.y = 0;
         this.width = 50;
         this.height = 50;
+        this.id = id;
+    }
+}
+
+class Bullet {
+    constructor(id) {
+        this.x = 0;
+        this.y = 0;
+        this.radius = 4;
         this.id = id;
     }
 }
