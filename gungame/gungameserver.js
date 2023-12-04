@@ -99,12 +99,13 @@ function gungameserver() {
     })
 
     handle_event(registered_events, 'shoot', (ws, data) => {
-        let dx = data.x - players[ws.id].x;
-        let dy = data.y - players[ws.id].y;
+        let player = players[ws.id];
+        let dx = data.x - player.x;
+        let dy = data.y - player.y;
         let d = Math.sqrt(dx*dx + dy*dy)
         let velx = dx/d * BULLET_SPEED;
         let vely = dy/d * BULLET_SPEED;
-        bullets[bullet_id] = new Bullet(bullet_id, players[ws.id].x, players[ws.id].y, velx, vely);
+        bullets[bullet_id] = new Bullet(bullet_id, player.x + player.width / 2, player.y + player.height /2, velx, vely, ws.id);
         websocketserver.clients.forEach((client) => {
             sendJSON(client, {command: 'init_bullet', data: bullets[bullet_id]})
         })
@@ -159,7 +160,7 @@ function gungameserver() {
 
             let bullet_hit = false;
             for (let player of Object.values(players)) {
-                if (bullet.x + bullet.radius > player.x && bullet.x < player.x + player.width && bullet.y < player.y + player.height && bullet.y + bullet.radius > player.y) {
+                if (player.id != bullet.playerID && bullet.x + bullet.radius > player.x && bullet.x < player.x + player.width && bullet.y < player.y + player.height && bullet.y + bullet.radius > player.y) {
                     bullet_hit = true;
                     player.hp -= 2;
 
@@ -204,13 +205,14 @@ class Player {
 }
 
 class Bullet {
-    constructor(id, x, y, velx, vely) {
+    constructor(id, x, y, velx, vely, playerid) {
         this.x = x;
         this.y = y;
         this.radius = 4;
         this.id = id;
         this.velx = velx;
         this.vely = vely;
+        this.playerID = playerid;
     }
 }
 
