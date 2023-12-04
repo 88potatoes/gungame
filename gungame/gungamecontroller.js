@@ -9,21 +9,24 @@ websocket.onopen = () => {
 const upbutton = document.getElementById('upbutton');
 upbutton.addEventListener('click', (e) => {
     e.preventDefault();
-    sendJSON(websocket, {command: 'phone', data: {message: 'hi'}})
+    sendJSON(websocket, {command: 'move-up'})
 })
 
-const downbutton = document.getElementById('upbutton');
+const downbutton = document.getElementById('downbutton');
 downbutton.addEventListener('click', (e) => {
+    sendJSON(websocket, {command: 'move-down'})
     e.preventDefault();
 })
 
-const leftbutton = document.getElementById('upbutton');
+const leftbutton = document.getElementById('leftbutton');
 leftbutton.addEventListener('click', (e) => {
     e.preventDefault();
+    sendJSON(websocket, {command: 'move-left'})
 })
 
-const rightbutton = document.getElementById('upbutton');
+const rightbutton = document.getElementById('rightbutton');
 rightbutton.addEventListener('click', (e) => {
+    sendJSON(websocket, {command: 'move-right'})
     e.preventDefault();
 })
 console.log('connected')
