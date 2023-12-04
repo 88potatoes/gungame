@@ -2,6 +2,9 @@
 const canvas = document.getElementById('canv');
 const playerListElement = document.getElementById('playerlist')
 const { sendJSON, handle_event, parseJSON } = require('../ws-helpers.js')
+const info = require('../info.json')
+
+console.log(info);
 
 // checks whether client device is a mobile device
 // from https://stackoverflow.com/questions/11381673/detecting-a-mobile-browser
@@ -14,7 +17,7 @@ let goleft = false;
 
 // const websocket = new WebSocket('ws://localhost:8082')
 console.log('after loading websocket')
-const websocket = new WebSocket('ws://192.168.50.29:8082')
+const websocket = new WebSocket(`ws://${info.ip_address}:8082`)
 
 const registered_events = {}
 let players = {}
@@ -214,7 +217,11 @@ class Player {
         this.id = id;
     }
 }
-},{"../ws-helpers.js":2}],2:[function(require,module,exports){
+},{"../info.json":2,"../ws-helpers.js":3}],2:[function(require,module,exports){
+module.exports={
+    "ip_address": "192.168.50.66"
+}
+},{}],3:[function(require,module,exports){
 
 /**
  * Send JSON(s) through websocket

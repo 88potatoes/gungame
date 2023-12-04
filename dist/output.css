@@ -643,6 +643,10 @@ video {
   inset-inline-end: 0.25rem;
 }
 
+.start-1 {
+  inset-inline-start: 0.25rem;
+}
+
 .isolate {
   isolation: isolate;
 }
@@ -806,16 +810,16 @@ video {
   height: 40rem;
 }
 
+.h-\[80vw\] {
+  height: 80vw;
+}
+
 .h-full {
   height: 100%;
 }
 
 .h-screen {
   height: 100vh;
-}
-
-.h-\[80vw\] {
-  height: 80vw;
 }
 
 .min-h-\[4rem\] {
@@ -838,12 +842,12 @@ video {
   width: 40rem;
 }
 
-.w-full {
-  width: 100%;
-}
-
 .w-\[80vw\] {
   width: 80vw;
+}
+
+.w-full {
+  width: 100%;
 }
 
 .flex-shrink {

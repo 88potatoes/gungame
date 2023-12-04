@@ -2,6 +2,8 @@ const express = require('express');
 const { tugofwarserver } = require('./tugwar');
 const { gungameserver } = require('./gungame/gungameserver');
 const useragent = require('express-useragent')
+require('dotenv').config()
+console.log(process.env)
 
 const webserver = express()
 
@@ -27,6 +29,8 @@ webserver.get('/gungame', (req, res) => {
     const isMobile = ua.isMobile;
     // console.log(`isMobile: ${isMobile}`)
 
+    console.log('reached server')
+
     if (isMobile) {
         res.sendFile('/gungame/gungamecontroller.html', { root: __dirname })
     } else {
@@ -46,11 +50,11 @@ webserver.get('/dist/gungamecontroller.js', (req, res) => {
 // webserver.get('/static/dead.png', (req, res) => {
 //     res.sendFile('./static/dead.png', { root: __dirname })
 // })
-webserver.listen(8080, '192.168.50.29', () => {
+webserver.listen(8080, process.env.IP_ADDRESS, () => {
     console.log(`listening on port ${8080}`)
 });
 
-const sockserver = tugofwarserver();
+// const sockserver = tugofwarserver();
 
 gungameserver();
 
