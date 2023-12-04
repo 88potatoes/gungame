@@ -68,6 +68,10 @@ handle_event(registered_events, 'disconnect', (data) => {
     delete players[data.player]
     canvas.removeChild(playerElements[data.player])
     delete playerElements[data.player]
+    
+    // remove from lobby
+    playerListElement.removeChild(lobbyElements[data.player])
+    delete lobbyElements[data.player]
 })
 
 handle_event(registered_events, 'move-hor', (data) => {
