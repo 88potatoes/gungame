@@ -1,5 +1,6 @@
 const { WebSocketServer } = require('ws');
 const { handle_event, get_id, parseJSON, sendJSON } = require('../ws-helpers');
+const { send } = require('vite');
 
 function gungameserver() {
     const SPEED = 5;
@@ -147,6 +148,9 @@ function gungameserver() {
         for (let bullet of Object.values(bullets)) {
             if (bullet.x > 640 || bullet.x < 0 || bullet.y > 640 || bullet.y < 0) {
                 delete bullets[bullet.id];
+                websocketserver.clients.forEach((client) => {
+                    sendJSON(client, {command: "delete_bullet", data: {id: bullet.id}})
+                })
                 continue;
             }
 

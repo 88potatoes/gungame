@@ -87,6 +87,12 @@ handle_event(registered_events, 'update_bullet', (data) => {
     bulletElements[data.id].style.top = `${data.y}px`;
 })
 
+handle_event(registered_events, 'delete_bullet', (data) => {
+    delete bullets[data.id];
+    canvas.removeChild(bulletElements[data.id]);
+    delete bulletElements[data.id];
+})
+
 canvas.addEventListener('mousedown', (e) => {
     let boundingRect = canvas.getBoundingClientRect();
 
