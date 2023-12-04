@@ -1,5 +1,6 @@
 (function(){function r(e,n,t){function o(i,f){if(!n[i]){if(!e[i]){var c="function"==typeof require&&require;if(!f&&c)return c(i,!0);if(u)return u(i,!0);var a=new Error("Cannot find module '"+i+"'");throw a.code="MODULE_NOT_FOUND",a}var p=n[i]={exports:{}};e[i][0].call(p.exports,function(r){var n=e[i][1][r];return o(n||r)},p,p.exports,r,e,n,t)}return n[i].exports}for(var u="function"==typeof require&&require,i=0;i<t.length;i++)o(t[i]);return o}return r})()({1:[function(require,module,exports){
 const canvas = document.getElementById('canv');
+const playerListElement = document.getElementById('playerlist')
 const { sendJSON, handle_event, parseJSON } = require('../ws-helpers.js')
 let goup = false;
 let godown = false;
@@ -13,6 +14,7 @@ let players = {}
 let playerElements = {}
 let bullets = {}
 let bulletElements = {}
+let lobbyElements = {}
 
 
 websocket.onmessage = (event) => {
@@ -29,11 +31,17 @@ handle_event(registered_events, 'init_players', (data) => {
     console.log("init players", Object.values(players))
 
     for (let player of Object.values(players)) {
-        console.log(player)
+        // console.log(player)
         let playerEl = document.createElement('div');
         playerEl.style = `position: absolute; background: red; width: ${player.width}px; height: ${player.height}px; left: ${player.x}px; top: ${player.y}px;`;
         playerElements[player.id] = playerEl;
         canvas.appendChild(playerElements[player.id]);
+
+        // for lobby
+        const lobbyElement = document.createElement('li');
+        lobbyElement.innerText = `Player ${player.id}`;
+        lobbyElements[player.id] = lobbyElement;
+        playerListElement.appendChild(lobbyElement)
     }
 })
 
@@ -48,6 +56,12 @@ handle_event(registered_events, 'add_player', (data) => {
     playerEl.id = `p${player.id}`
     playerElements[player.id] = playerEl;
     canvas.appendChild(playerElements[player.id]);
+
+    // for lobby
+    const lobbyElement = document.createElement('li');
+    lobbyElement.innerText = `Player ${player.id}`;
+    lobbyElements[player.id] = lobbyElement;
+    playerListElement.appendChild(lobbyElement)
 })
 
 //handle disconnect event
