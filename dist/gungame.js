@@ -10,11 +10,6 @@ console.log(info);
 // from https://stackoverflow.com/questions/11381673/detecting-a-mobile-browser
 // DON'T need anymore
 
-let goup = false;
-let godown = false;
-let goright = false;
-let goleft = false;
-
 // const websocket = new WebSocket('ws://localhost:8082')
 console.log('after loading websocket')
 const websocket = new WebSocket(`ws://${info.ip_address}:8082`)
@@ -129,94 +124,6 @@ handle_event(registered_events, 'alert', (data) => {
     alert(data.message)
 })
 
-canvas.addEventListener('mousedown', (e) => {
-    let boundingRect = canvas.getBoundingClientRect();
-
-    let divx = e.clientX - boundingRect.left;
-    let divy = e.clientY - boundingRect.top;
-
-    sendJSON(websocket, {command: "shoot", data: {x: divx, y: divy}})
-})
-
-document.addEventListener('keydown', (event) => {
-    switch (event.key) {
-        case 'w':
-            goup = true;
-            break;
-        case 'a':
-            goleft = true;
-            break;
-        case 's':
-            godown = true;
-            break;
-        case 'd':
-            goright = true;
-            break;
-    }
-})
-
-document.addEventListener('keyup', (event) => {
-    switch (event.key) {
-        case 'w':
-            goup = false;
-            break;
-        case 'a':
-            goleft = false;
-            break;
-        case 's':
-            godown = false;
-            break;
-        case 'd':
-            goright = false;
-            break;
-    }
-})
-
-// lose focus
-window.addEventListener('blur', () => {
-    console.log('lost focus')
-    goup = false;
-    godown = false;
-    goleft = false;
-    goright = false;
-})
-
-const loop = () => {
-    update();
-    render();
-    requestAnimationFrame(loop)
-};
-
-window.requestAnimationFrame(loop)
-
-function update() {
-    if (goup) {
-        sendJSON(websocket, {command: "move-up"})
-    }
-    if (godown) {
-        sendJSON(websocket, {command: "move-down"})
-    }
-    if (goleft) {
-        sendJSON(websocket, {command: "move-left"})
-    }
-    if (goright) {
-        sendJSON(websocket, {command: "move-right"})
-    }
-}
-
-function render() {
-    //skip
-}
-
-class Player {
-    constructor(id) {
-        this.x = 0;
-        this.y = 0;
-        this.width = 10;
-        this.height = 10;
-        this.id = id;
-    }
-}
 },{"../info.json":2,"../ws-helpers.js":3}],2:[function(require,module,exports){
 module.exports={
     "ip_address": "192.168.50.66"
