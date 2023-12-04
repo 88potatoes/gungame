@@ -4,14 +4,24 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Gungame Controller</title>
-    <script src='/dist/gungamecontroller.js'></script>
+    <link rel="stylesheet" href="/dist/output.css">
+    <script src='/dist/gungamecontroller.js' defer></script>
 </head>
-<body>
-    <div class="w-[80vw] h-[80vw] bg-slate-400" id="arrow-container">
-        <button>Left</button>
-        <button>Right</button>
-        <button>Up</button>
-        <button>Down</button>
+<body class="flex flex-col items-center justify-center h-full w-full">
+    <div class="w-[80vw] h-[80vw] bg-slate-400 grid grid-rows-3 grid-cols-3" id="arrow-container">
+        <div></div>
+        <button id="upbutton" class="bg-slate-100"></button>
+        <div></div>
+        <button id="leftbutton"></button>
+        <div></div>
+        <button id="rightbutton"></button>
+        <div></div>
+        <button id="downbutton"></button>
+        <div></div>
     </div>
+
+    <script>
+        
+    </script>
 </body>
 </html>

@@ -21,11 +21,11 @@ webserver.get('/', (req, res) => {
 
 webserver.get('/gungame', (req, res) => {
     const source = req.headers['user-agent']
-    console.log(`source: ${source}`)
+    // console.log(`source: ${source}`)
     const ua = useragent.parse(source);
-    console.log(`ua: ${ua}`)
+    // console.log(`ua: ${ua}`)
     const isMobile = ua.isMobile;
-    console.log(`isMobile: ${isMobile}`)
+    // console.log(`isMobile: ${isMobile}`)
 
     if (isMobile) {
         res.sendFile('/gungame/gungamecontroller.html', { root: __dirname })
@@ -36,6 +36,11 @@ webserver.get('/gungame', (req, res) => {
 webserver.get('/gungame.js', (req, res) => {
     res.sendFile('./dist/gungame.js', { root: __dirname })
 })
+
+webserver.get('/dist/gungamecontroller.js', (req, res) => {
+    res.sendFile('/dist/gungamecontroller.js', { root: __dirname });
+})
+
 
 
 // webserver.get('/static/dead.png', (req, res) => {

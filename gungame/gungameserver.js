@@ -136,6 +136,11 @@ function gungameserver() {
         }
 
         ws.onmessage = (message) => {
+            if (message.data == 'hi') {
+                console.log('hi')
+                return;
+            }
+
             const [command, data] = parseJSON(message.data)
             
             if (command in registered_events) {

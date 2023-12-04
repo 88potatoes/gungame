@@ -3,6 +3,10 @@ const canvas = document.getElementById('canv');
 const playerListElement = document.getElementById('playerlist')
 const { sendJSON, handle_event, parseJSON } = require('../ws-helpers.js')
 
+// checks whether client device is a mobile device
+// from https://stackoverflow.com/questions/11381673/detecting-a-mobile-browser
+// DON'T need anymore
+
 let goup = false;
 let godown = false;
 let goright = false;
