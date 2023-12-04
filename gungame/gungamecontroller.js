@@ -30,3 +30,8 @@ rightbutton.addEventListener('click', (e) => {
     sendJSON(websocket, {command: 'move-right'})
     e.preventDefault();
 })
+
+// prevent double click zoom on phone
+document.ondblclick = function(e) {
+    e.preventDefault()
+}

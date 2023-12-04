@@ -31,11 +31,11 @@ webserver.get('/gungame', (req, res) => {
 
     console.log('reached server')
 
-    if (isMobile) {
+    // if (isMobile) {
         res.sendFile('/gungame/gungamecontroller.html', { root: __dirname })
-    } else {
-        res.sendFile('/gungame/gungame.html', { root: __dirname })
-    }
+    // } else {
+    //     res.sendFile('/gungame/gungame.html', { root: __dirname })
+    // }
 })
 webserver.get('/gungame.js', (req, res) => {
     res.sendFile('./dist/gungame.js', { root: __dirname })
