@@ -130,6 +130,15 @@ document.addEventListener('keyup', (event) => {
     }
 })
 
+// lose focus
+window.addEventListener('blur', () => {
+    console.log('lost focus')
+    goup = false;
+    godown = false;
+    goleft = false;
+    goright = false;
+})
+
 const loop = () => {
     update();
     render();
