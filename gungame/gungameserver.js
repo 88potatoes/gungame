@@ -112,6 +112,10 @@ function gungameserver() {
         bullet_id++;
     })
 
+    handle_event(registered_events, 'phone', (ws, data) => {
+        console.log(data);
+    })
+
     websocketserver.on('connection', (ws) => {
         ws.id = get_id();
         console.log('connected', ws.id);
@@ -136,11 +140,6 @@ function gungameserver() {
         }
 
         ws.onmessage = (message) => {
-            if (message.data == 'hi') {
-                console.log('hi')
-                return;
-            }
-
             const [command, data] = parseJSON(message.data)
             
             if (command in registered_events) {

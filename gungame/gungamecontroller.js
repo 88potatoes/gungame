@@ -1,9 +1,10 @@
+const { sendJSON } = require('../ws-helpers')
 const websocket = new WebSocket('ws://192.168.50.29:8082')
 
 const upbutton = document.getElementById('upbutton');
 upbutton.addEventListener('click', (e) => {
     e.preventDefault();
-    websocket.send('hi')
+    sendJSON(websocket, {command: 'phone', data: {message: 'hi'}})
 })
 
 const downbutton = document.getElementById('upbutton');
