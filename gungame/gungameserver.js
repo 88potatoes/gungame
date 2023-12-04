@@ -1,6 +1,5 @@
 const { WebSocketServer } = require('ws');
 const { handle_event, get_id, parseJSON, sendJSON } = require('../ws-helpers');
-const { send } = require('vite');
 
 function gungameserver() {
     const SPEED = 5;
