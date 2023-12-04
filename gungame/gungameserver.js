@@ -12,7 +12,20 @@ function gungameserver() {
 
     handle_event(registered_events, 'move-left', (ws) => {
         current_player = players[ws.id];
-        current_player.x = max(0, current_player.x - SPEED)
+
+        // detecting future collision
+        let future_x = max(0, current_player.x - SPEED);
+
+        for (let player of Object.values(players)) {
+            if (player == current_player) {
+                continue;
+            }
+            if (current_player.y < player.y + player.height && current_player.y + current_player.height > player.y && current_player.x >= player.x + player.width) {
+                future_x = max(player.x + player.width, future_x)
+            }
+        }
+
+        current_player.x = future_x;
 
         websocketserver.clients.forEach((client) => {
             sendJSON(client, {command: "move-hor", data: {player: ws.id, x: current_player.x}})
@@ -21,7 +34,18 @@ function gungameserver() {
 
     handle_event(registered_events, 'move-right', (ws) => {
         current_player = players[ws.id];
-        current_player.x = min(640 - current_player.width, current_player.x + SPEED);
+        let future_x = min(640 - current_player.width, current_player.x + SPEED);
+
+        for (let player of Object.values(players)) {
+            if (player == current_player) {
+                continue;
+            }
+            if (current_player.y < player.y + player.height && current_player.y + current_player.height > player.y && current_player.x + current_player.width <= player.x) {
+                future_x = min(player.x - current_player.width, future_x)
+            }
+        }
+
+        current_player.x = future_x;
 
         websocketserver.clients.forEach((client) => {
             sendJSON(client, {command: "move-hor", data: {player: ws.id, x: current_player.x}})
@@ -30,7 +54,18 @@ function gungameserver() {
 
     handle_event(registered_events, 'move-up', (ws) => {
         current_player = players[ws.id];
-        current_player.y = max(0, current_player.y - SPEED);
+        let future_y = max(0, current_player.y - SPEED);
+
+        for (let player of Object.values(players)) {
+            if (player == current_player) {
+                continue;
+            }
+            if (current_player.x < player.x + player.width && current_player.x + current_player.width > player.x && current_player.y >= player.y + player.height) {
+                future_y = max(player.y + player.height, future_y)
+            }
+        }
+
+        current_player.y = future_y;
 
         websocketserver.clients.forEach((client) => {
             sendJSON(client, {command: "move-ver", data: { player: ws.id, y: current_player.y}})
@@ -39,7 +74,18 @@ function gungameserver() {
 
     handle_event(registered_events, 'move-down', (ws) => {
         current_player = players[ws.id];
-        current_player.y = min(640 - current_player.width, current_player.y + SPEED);
+        let future_y = min(640 - current_player.height, current_player.y + SPEED);
+
+        for (let player of Object.values(players)) {
+            if (player == current_player) {
+                continue;
+            }
+            if (current_player.x < player.x + player.width && current_player.x + current_player.width > player.x && current_player.y + current_player.height <= player.y) {
+                future_y = min(player.y - current_player.height, future_y)
+            }
+        }
+
+        current_player.y = future_y;
 
         websocketserver.clients.forEach((client) => {
             sendJSON(client, {command: "move-ver", data: {player: ws.id, y: current_player.y}})
