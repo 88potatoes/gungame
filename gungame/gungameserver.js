@@ -146,6 +146,8 @@ function gungameserver() {
 
     function update() {
         for (let bullet of Object.values(bullets)) {
+            bullet.x += bullet.velx;
+            bullet.y += bullet.vely;
             if (bullet.x > 640 || bullet.x < 0 || bullet.y > 640 || bullet.y < 0) {
                 delete bullets[bullet.id];
                 websocketserver.clients.forEach((client) => {
@@ -154,8 +156,18 @@ function gungameserver() {
                 continue;
             }
 
-            bullet.x += bullet.velx;
-            bullet.y += bullet.vely;
+
+            for (let player of Object.values(players)) {
+                if (bullet.x + bullet.radius > player.x && bullet.x < player.x + player.width && bullet.y < player.y + player.height && bullet.y + bullet.radius > player.y) {
+                    player.hp -= 2;
+                    delete bullets[bullet.id];
+                    websocketserver.clients.forEach((client) => {
+                        sendJSON(client, {command: "delete_bullet", data: {id: bullet.id}})
+                    })
+                    continue;
+                }
+            }
+
             websocketserver.clients.forEach((client) => {
                 sendJSON(client, {command: "update_bullet", data: {id: bullet.id, x: bullet.x, y: bullet.y}})
             })
@@ -176,6 +188,7 @@ class Player {
         this.width = 50;
         this.height = 50;
         this.id = id;
+        this.hp = 10;
     }
 }
 
