@@ -93,6 +93,10 @@ handle_event(registered_events, 'delete_bullet', (data) => {
     delete bulletElements[data.id];
 })
 
+handle_event(registered_events, 'alert', (data) => {
+    alert(data.message)
+})
+
 canvas.addEventListener('mousedown', (e) => {
     let boundingRect = canvas.getBoundingClientRect();
 

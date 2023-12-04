@@ -157,15 +157,26 @@ function gungameserver() {
             }
 
 
+            let bullet_hit = false;
             for (let player of Object.values(players)) {
                 if (bullet.x + bullet.radius > player.x && bullet.x < player.x + player.width && bullet.y < player.y + player.height && bullet.y + bullet.radius > player.y) {
+                    bullet_hit = true;
                     player.hp -= 2;
+
+                    if (player.hp <= 0) {
+                        websocketserver.clients.forEach((client) => {
+                            sendJSON(client, {command: "alert", data: {message: "player died"}})
+                        })
+                    }
                     delete bullets[bullet.id];
                     websocketserver.clients.forEach((client) => {
                         sendJSON(client, {command: "delete_bullet", data: {id: bullet.id}})
                     })
-                    continue;
+                    break;
                 }
+            }
+            if (bullet_hit) {
+                continue;
             }
 
             websocketserver.clients.forEach((client) => {
