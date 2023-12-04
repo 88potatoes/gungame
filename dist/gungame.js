@@ -23,6 +23,10 @@ let bullets = {}
 let bulletElements = {}
 let lobbyElements = {}
 
+websocket.onopen = () => {
+    sendJSON(websocket, {command: "desktop_join"})
+}
+
 
 websocket.onmessage = (event) => {
     const [command, data] = parseJSON(event.data);

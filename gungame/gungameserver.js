@@ -12,6 +12,7 @@ function gungameserver() {
     const players = {}
     const bullets = {}
     const registered_events = {}
+    const desktops = {}
 
     let bullet_id = 0;
 
@@ -112,20 +113,34 @@ function gungameserver() {
         bullet_id++;
     })
 
-    handle_event(registered_events, 'phone', (ws, data) => {
-        console.log(data);
+    handle_event(registered_events, 'phone_join', (ws, data) => {
+        ws.device = 'phone'
+        players[ws.id] = new Player(ws.id);
+        
+        for (let desktop of Object.values(desktops)) {
+            sendJSON(desktop, {command: "add_player", data: {[ws.id]: players[ws.id]}})
+        }
+    })
+
+    handle_event(registered_events, 'desktop_join', (ws, data) => {
+        ws.device = 'desktop'
+        desktops[ws.id] = ws;
+        // send all player data
+        sendJSON(ws, {command: "init_players", data: players});
     })
 
     websocketserver.on('connection', (ws) => {
         ws.id = get_id();
+        // to determine device - is set in 'desktop_join' and 'phone_join' event
+        ws.device = null;
+
         console.log('connected', ws.id);
         // send all player data
-        sendJSON(ws, {command: "init_players", data: players});
-        
-        players[ws.id] = new Player(ws.id);
-        for (let client of websocketserver.clients) {
-            sendJSON(client, {command: "add_player", data: {[ws.id]: players[ws.id]}})
-        }
+        // sendJSON(ws, {command: "init_players", data: players});
+        // players[ws.id] = new Player(ws.id);
+        // for (let client of websocketserver.clients) {
+        //     sendJSON(client, {command: "add_player", data: {[ws.id]: players[ws.id]}})
+        // }
 
         ws.onclose = () => {
             console.log('disconnected', ws.id)
