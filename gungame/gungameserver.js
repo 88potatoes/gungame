@@ -20,7 +20,8 @@ function gungameserver() {
         new SquareBlock(80, 240, 80),
         new SquareBlock(240, 240, 80)
     ]
-
+    const bombs = [];
+    
     let bullet_id = 0;
 
     handle_event(registered_events, 'move-left', (ws) => {
