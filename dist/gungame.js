@@ -141,6 +141,11 @@ handle_event(registered_events, 'create_bomb', (data) => {
     canvas.appendChild(bombElement)
 })
 
+handle_event(registered_events, 'explode_bomb', (data) => {
+    canvas.removeChild(bombElements[data.id]);
+    delete bombElements[data.id]
+})
+
 },{"../info.json":2,"../ws-helpers.js":3}],2:[function(require,module,exports){
 module.exports={
     "ip_address": "192.168.50.66"

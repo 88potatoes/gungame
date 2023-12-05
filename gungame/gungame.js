@@ -139,3 +139,8 @@ handle_event(registered_events, 'create_bomb', (data) => {
     bombElements[data.id] = bombElement;
     canvas.appendChild(bombElement)
 })
+
+handle_event(registered_events, 'explode_bomb', (data) => {
+    canvas.removeChild(bombElements[data.id]);
+    delete bombElements[data.id]
+})

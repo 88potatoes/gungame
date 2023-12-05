@@ -50,9 +50,9 @@ function gungameserver() {
 
         current_player.x = future_x;
 
-        websocketserver.clients.forEach((client) => {
-            sendJSON(client, {command: "move-hor", data: {player: ws.id, x: current_player.x}})
-        });
+        for (let desktop of Object.values(desktops)) {
+            sendJSON(desktop, {command: "move-hor", data: {player: ws.id, x: current_player.x}})
+        }
     })
 
     handle_event(registered_events, 'move-right', (ws) => {
@@ -76,9 +76,9 @@ function gungameserver() {
 
         current_player.x = future_x;
 
-        websocketserver.clients.forEach((client) => {
-            sendJSON(client, {command: "move-hor", data: {player: ws.id, x: current_player.x}})
-        });
+        for (let desktop of Object.values(desktops)) {
+            sendJSON(desktop, {command: "move-hor", data: {player: ws.id, x: current_player.x}})
+        }
     })
 
     handle_event(registered_events, 'move-up', (ws) => {
@@ -104,9 +104,9 @@ function gungameserver() {
 
         current_player.y = future_y;
 
-        websocketserver.clients.forEach((client) => {
-            sendJSON(client, {command: "move-ver", data: { player: ws.id, y: current_player.y}})
-        });
+        for (let desktop of Object.values(desktops)) {
+            sendJSON(desktop, {command: "move-ver", data: { player: ws.id, y: current_player.y}})
+        }
     })
 
     handle_event(registered_events, 'move-down', (ws) => {
@@ -130,25 +130,25 @@ function gungameserver() {
 
         current_player.y = future_y;
 
-        websocketserver.clients.forEach((client) => {
-            sendJSON(client, {command: "move-ver", data: {player: ws.id, y: current_player.y}})
-        });
+        for (let desktop of Object.values(desktops)) {
+            sendJSON(desktop, {command: "move-ver", data: {player: ws.id, y: current_player.y}})
+        }
     })
 
-    handle_event(registered_events, 'shoot', (ws, data) => {
-        let player = players[ws.id];
-        let dx = data.x - player.x;
-        let dy = data.y - player.y;
-        let d = Math.sqrt(dx*dx + dy*dy)
-        let velx = dx/d * BULLET_SPEED;
-        let vely = dy/d * BULLET_SPEED;
-        bullets[bullet_id] = new Bullet(bullet_id, player.x + player.width / 2, player.y + player.height /2, velx, vely, ws.id);
-        websocketserver.clients.forEach((client) => {
-            sendJSON(client, {command: 'init_bullet', data: bullets[bullet_id]})
-        })
+    // handle_event(registered_events, 'shoot', (ws, data) => {
+    //     let player = players[ws.id];
+    //     let dx = data.x - player.x;
+    //     let dy = data.y - player.y;
+    //     let d = Math.sqrt(dx*dx + dy*dy)
+    //     let velx = dx/d * BULLET_SPEED;
+    //     let vely = dy/d * BULLET_SPEED;
+    //     bullets[bullet_id] = new Bullet(bullet_id, player.x + player.width / 2, player.y + player.height /2, velx, vely, ws.id);
+    //     websocketserver.clients.forEach((client) => {
+    //         sendJSON(client, {command: 'init_bullet', data: bullets[bullet_id]})
+    //     })
 
-        bullet_id++;
-    })
+    //     bullet_id++;
+    // })
 
     handle_event(registered_events, 'phone_join', (ws, data) => {
         ws.device = 'phone'
@@ -174,9 +174,10 @@ function gungameserver() {
         const player = players[ws.id]
         const bomb = new Bomb(player.x + player.width / 2 - Bomb.sideLength / 2, player.y + player.height / 2 - Bomb.sideLength / 2, bombid)
         bombs[bombid] = bomb
-        websocketserver.clients.forEach((client) => {
-            sendJSON(client, {command: 'create_bomb', data: {x: bomb.x, y: bomb.y, sideLength: bomb.sideLength, id: bomb.id}})
-        }) 
+        
+        for (let desktop of Object.values(desktops)) {
+            sendJSON(desktop, {command: 'create_bomb', data: {x: bomb.x, y: bomb.y, sideLength: Bomb.sideLength, id: bomb.id}})
+        }
     })
 
     websocketserver.on('connection', (ws, req) => {
