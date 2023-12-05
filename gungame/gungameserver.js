@@ -267,6 +267,10 @@ function gungameserver() {
         for (let bomb of Object.values(bombs)) {
             if (bomb.framesTilBlow === 0) {
                 console.log('explode')
+                for (let desktop of Object.values(desktops)) {
+                    sendJSON(desktop, {command: 'explode_bomb', data: {id: bomb.id}})
+                }
+                delete bombs[bomb.id]
             }
             bomb.framesTilBlow--;
         }
