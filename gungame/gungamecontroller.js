@@ -85,3 +85,9 @@ function update() {
 document.body.oncontextmenu = (e) => {
     e.preventDefault();
 }
+
+const dcmessage = document.getElementById('dc-message')
+
+websocket.onclose = (e) => {
+    dcmessage.innerText = 'You have disconnected. Please refresh to rejoin'
+}

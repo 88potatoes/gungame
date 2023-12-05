@@ -86,6 +86,12 @@ function update() {
 document.body.oncontextmenu = (e) => {
     e.preventDefault();
 }
+
+const dcmessage = document.getElementById('dc-message')
+
+websocket.onclose = (e) => {
+    dcmessage.innerText = 'You have disconnected. Please refresh to rejoin'
+}
 },{"../info.json":2,"../ws-helpers":3}],2:[function(require,module,exports){
 module.exports={
     "ip_address": "192.168.50.66"
