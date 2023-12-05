@@ -10,6 +10,7 @@ function gungameserver() {
     const websocketserver = new WebSocketServer({ port: 8082 });
 
     const players = {}
+    const latent_players = {}
     const bullets = {}
     const registered_events = {}
     const desktops = {}
@@ -148,10 +149,12 @@ function gungameserver() {
 
     handle_event(registered_events, 'phone_join', (ws, data) => {
         ws.device = 'phone'
-        players[ws.id] = new Player(ws.id);
-        
-        for (let desktop of Object.values(desktops)) {
-            sendJSON(desktop, {command: "add_player", data: {[ws.id]: players[ws.id]}})
+        if (!ws.alreadyConnected) {
+            players[ws.id] = new Player(ws.id, ws.ip);
+            
+            for (let desktop of Object.values(desktops)) {
+                sendJSON(desktop, {command: "add_player", data: {[ws.id]: players[ws.id]}})
+            }
         }
     })
 
@@ -163,25 +166,33 @@ function gungameserver() {
         sendJSON(ws, {command: "init_walls", data: walls});
     })
 
-    websocketserver.on('connection', (ws) => {
-        ws.id = get_id();
+    websocketserver.on('connection', (ws, req) => {
+        const ip = req.socket.remoteAddress;
+        ws.ip = ip;
+        ws.alreadyConnected = false;
+
+        if (ws.ip in latent_players) {
+            console.log('reconnected', ws.ip)
+            let player = latent_players[ws.ip]
+            delete latent_players[ws.ip]
+            players[player.id] = player;
+            ws.id = player.id
+            ws.alreadyConnected = true;
+        } else {
+            ws.id = get_id();
+        }
         // to determine device - is set in 'desktop_join' and 'phone_join' event
         ws.device = null;
-
-        console.log('connected', ws.id);
-        // send all player data
-        // sendJSON(ws, {command: "init_players", data: players});
-        // players[ws.id] = new Player(ws.id);
-        // for (let client of websocketserver.clients) {
-        //     sendJSON(client, {command: "add_player", data: {[ws.id]: players[ws.id]}})
-        // }
+        console.log('connected', ws.ip, ws.id);
 
         ws.onclose = () => {
             console.log('disconnected', ws.id)
+            latent_players[ws.ip] = players[ws.id]
+            console.log(latent_players)
             delete players[ws.id]
-            websocketserver.clients.forEach((client) => {
-                sendJSON(client, {command: "disconnect", data: {player: ws.id}})
-            })
+            // websocketserver.clients.forEach((client) => {
+            //     sendJSON(client, {command: "disconnect", data: {player: ws.id}})
+            // })
         }
 
         ws.onerror = () => {
@@ -246,13 +257,14 @@ function gungameserver() {
 }
 
 class Player {
-    constructor(id) {
+    constructor(id, ip) {
         this.x = 0;
         this.y = 0;
         this.width = 50;
         this.height = 50;
         this.id = id;
         this.hp = 10;
+        this.ip = ip;
     }
 }
 
