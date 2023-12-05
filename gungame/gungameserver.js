@@ -172,7 +172,7 @@ function gungameserver() {
     handle_event(registered_events, 'drop-bomb', (ws, data) => {
         const bombid = get_id();
         const player = players[ws.id]
-        const bomb = new Bomb(player.x + player.width / 2, player.y + player.height / 2, bombid)
+        const bomb = new Bomb(player.x + player.width / 2 - Bomb.sideLength / 2, player.y + player.height / 2 - Bomb.sideLength / 2, bombid)
         bombs[bombid] = bomb
         websocketserver.clients.forEach((client) => {
             sendJSON(client, {command: 'create_bomb', data: {x: bomb.x, y: bomb.y, sideLength: bomb.sideLength, id: bomb.id}})
@@ -183,9 +183,8 @@ function gungameserver() {
         const ip = req.socket.remoteAddress;
         ws.ip = ip;
         ws.alreadyConnected = false;
-
+        
         if (ws.ip in latent_players) {
-            console.log('reconnected', ws.ip)
             let player = latent_players[ws.ip]
             delete latent_players[ws.ip]
             players[player.id] = player;
@@ -200,9 +199,11 @@ function gungameserver() {
 
         ws.onclose = () => {
             console.log('disconnected', ws.id)
-            latent_players[ws.ip] = players[ws.id]
+            if (ws.device === 'phone') {
+                latent_players[ws.ip] = players[ws.id]
+                delete players[ws.id]
+            }
             console.log(latent_players)
-            delete players[ws.id]
             // websocketserver.clients.forEach((client) => {
             //     sendJSON(client, {command: "disconnect", data: {player: ws.id}})
             // })
@@ -311,10 +312,10 @@ class Bullet {
 
 class Bomb {
     static damage = 1;
+    static sideLength = 30;
     constructor(x, y, id) {
         this.x = x;
         this.y = y;
-        this.sideLength = 30;
         this.framesTilBlow = 120;
         this.id = id;
     }
