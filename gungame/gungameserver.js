@@ -20,9 +20,9 @@ function gungameserver() {
         new SquareBlock(80, 240, 80),
         new SquareBlock(240, 240, 80)
     ]
-    const bombs = [
-        new Bomb(0, 0)
-    ];
+    const bombs = {
+        0: new Bomb(0, 0, 1)
+    };
 
     let bullet_id = 0;
 
@@ -172,7 +172,11 @@ function gungameserver() {
     handle_event(registered_events, 'drop-bomb', (ws, data) => {
         const bombid = get_id();
         const player = players[ws.id]
-        bombs[bombid] = new Bomb(player.x + player.width / 2, player.y + player.height / 2)
+        const bomb = new Bomb(player.x + player.width / 2, player.y + player.height / 2, bombid)
+        bombs[bombid] = bomb
+        websocketserver.clients.forEach((client) => {
+            sendJSON(client, {command: 'create_bomb', data: {x: bomb.x, y: bomb.y, sideLength: bomb.sideLength, id: bomb.id}})
+        }) 
     })
 
     websocketserver.on('connection', (ws, req) => {
@@ -258,7 +262,7 @@ function gungameserver() {
         //     })
         // }
 
-        for (let bomb of bombs) {
+        for (let bomb of Object.values(bombs)) {
             if (bomb.framesTilBlow === 0) {
                 console.log('explode')
             }
@@ -307,11 +311,12 @@ class Bullet {
 
 class Bomb {
     static damage = 1;
-    constructor(x, y) {
+    constructor(x, y, id) {
         this.x = x;
         this.y = y;
         this.sideLength = 30;
         this.framesTilBlow = 120;
+        this.id = id;
     }
 }
 

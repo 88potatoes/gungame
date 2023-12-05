@@ -19,6 +19,7 @@ let playerElements = {}
 let bullets = {}
 let bulletElements = {}
 let lobbyElements = {}
+let bombElements = {}
 // let wallElements = []
 
 websocket.onopen = () => {
@@ -130,6 +131,11 @@ handle_event(registered_events, 'init_walls', (data) => {
         wallElement.style = `position: absolute; background: blue; width: ${wall.sideLength}px; height: ${wall.sideLength}px; left: ${wall.x}px; top: ${wall.y}px;`
         canvas.appendChild(wallElement)
     }
+})
 
-
+handle_event(registered_events, 'create_bomb', (data) => {
+    const bombElement = document.createElement('div')
+    bombElement.style = `position: absolute; background: green; width: ${data.sideLength}px; height: ${data.sideLength}px; left: ${data.x}px; top: ${data.y}px;`
+    bombElements[data.id] = bombElement;
+    canvas.appendChild(bombElement)
 })
