@@ -81,3 +81,7 @@ function update() {
         sendJSON(websocket, {command: "move-right"})
     }
 }
+
+document.body.oncontextmenu = (e) => {
+    e.preventDefault();
+}

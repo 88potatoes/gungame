@@ -37,6 +37,13 @@ function gungameserver() {
             }
         }
 
+        // collisions with blocks
+        for (let wall of walls) {
+            if (current_player.y < wall.y + wall.sideLength && current_player.y + current_player.width > wall.y && current_player.x >= wall.x + wall.sideLength) {
+                future_x = max(wall.x + wall.sideLength, future_x)
+            }
+        }
+
         current_player.x = future_x;
 
         websocketserver.clients.forEach((client) => {
@@ -57,6 +64,12 @@ function gungameserver() {
             }
         }
 
+        for (let wall of walls) {
+            if (current_player.y < wall.y + wall.sideLength && current_player.y + current_player.height > wall.y && current_player.x + current_player.width <= wall.x) {
+                future_x = min(wall.x - current_player.width, future_x)
+            }
+        }
+
         current_player.x = future_x;
 
         websocketserver.clients.forEach((client) => {
@@ -68,12 +81,20 @@ function gungameserver() {
         current_player = players[ws.id];
         let future_y = max(0, current_player.y - SPEED);
 
+        // collisions with other players
         for (let player of Object.values(players)) {
             if (player == current_player) {
                 continue;
             }
             if (current_player.x < player.x + player.width && current_player.x + current_player.width > player.x && current_player.y >= player.y + player.height) {
                 future_y = max(player.y + player.height, future_y)
+            }
+        }
+
+        // collisions with blocks
+        for (let wall of walls) {
+            if (current_player.x < wall.x + wall.sideLength && current_player.x + current_player.width > wall.x && current_player.y >= wall.y + wall.sideLength) {
+                future_y = max(wall.y + wall.sideLength, future_y)
             }
         }
 
@@ -94,6 +115,12 @@ function gungameserver() {
             }
             if (current_player.x < player.x + player.width && current_player.x + current_player.width > player.x && current_player.y + current_player.height <= player.y) {
                 future_y = min(player.y - current_player.height, future_y)
+            }
+        }
+
+        for (let wall of walls) {
+            if (current_player.x < wall.x + wall.sideLength && current_player.x + current_player.width > wall.x && current_player.y + current_player.height <= wall.y) {
+                future_y = min(wall.y - current_player.height, future_y)
             }
         }
 

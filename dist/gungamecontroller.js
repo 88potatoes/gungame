@@ -82,6 +82,10 @@ function update() {
         sendJSON(websocket, {command: "move-right"})
     }
 }
+
+document.body.oncontextmenu = (e) => {
+    e.preventDefault();
+}
 },{"../info.json":2,"../ws-helpers":3}],2:[function(require,module,exports){
 module.exports={
     "ip_address": "192.168.50.66"
