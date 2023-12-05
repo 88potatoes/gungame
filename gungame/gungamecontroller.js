@@ -53,6 +53,13 @@ rightbutton.addEventListener('touchend', (e) => {
     goright = false;
 })
 
+const bombbutton = document.getElementById('bombbutton');
+bombbutton.addEventListener('touchstart', (e) => {
+    e.preventDefault()
+    sendJSON(websocket, {command: 'drop-bomb'})
+})
+
+
 // prevent double click zoom on phone
 document.ondblclick = function(e) {
     e.preventDefault()

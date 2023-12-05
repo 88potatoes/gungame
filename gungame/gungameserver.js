@@ -169,6 +169,12 @@ function gungameserver() {
         sendJSON(ws, {command: "init_walls", data: walls});
     })
 
+    handle_event(registered_events, 'drop-bomb', (ws, data) => {
+        const bombid = get_id();
+        const player = players[ws.id]
+        bombs[bombid] = new Bomb(player.x + player.width / 2, player.y + player.height / 2)
+    })
+
     websocketserver.on('connection', (ws, req) => {
         const ip = req.socket.remoteAddress;
         ws.ip = ip;
