@@ -24,7 +24,7 @@ function parseJSON(json) {
 
 function* create_id_generator() {
     let i = 0;
-    while (i < 1000) {
+    while (i < 10000) {
         yield i;
         i++;
     }

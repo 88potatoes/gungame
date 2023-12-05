@@ -20,8 +20,10 @@ function gungameserver() {
         new SquareBlock(80, 240, 80),
         new SquareBlock(240, 240, 80)
     ]
-    const bombs = [];
-    
+    const bombs = [
+        new Bomb(0, 0)
+    ];
+
     let bullet_id = 0;
 
     handle_event(registered_events, 'move-left', (ws) => {
@@ -210,43 +212,51 @@ function gungameserver() {
     })
 
     function update() {
-        for (let bullet of Object.values(bullets)) {
-            bullet.x += bullet.velx;
-            bullet.y += bullet.vely;
-            if (bullet.x > 640 || bullet.x < 0 || bullet.y > 640 || bullet.y < 0) {
-                delete bullets[bullet.id];
-                websocketserver.clients.forEach((client) => {
-                    sendJSON(client, {command: "delete_bullet", data: {id: bullet.id}})
-                })
-                continue;
+        // no more need for bullets
+        // for (let bullet of Object.values(bullets)) {
+        //     bullet.x += bullet.velx;
+        //     bullet.y += bullet.vely;
+        //     if (bullet.x > 640 || bullet.x < 0 || bullet.y > 640 || bullet.y < 0) {
+        //         delete bullets[bullet.id];
+        //         websocketserver.clients.forEach((client) => {
+        //             sendJSON(client, {command: "delete_bullet", data: {id: bullet.id}})
+        //         })
+        //         continue;
+        //     }
+
+
+        //     let bullet_hit = false;
+        //     for (let player of Object.values(players)) {
+        //         if (player.id != bullet.playerID && bullet.x + bullet.radius > player.x && bullet.x < player.x + player.width && bullet.y < player.y + player.height && bullet.y + bullet.radius > player.y) {
+        //             bullet_hit = true;
+        //             player.hp -= 2;
+
+        //             if (player.hp <= 0) {
+        //                 websocketserver.clients.forEach((client) => {
+        //                     sendJSON(client, {command: "alert", data: {message: "player died"}})
+        //                 })
+        //             }
+        //             delete bullets[bullet.id];
+        //             websocketserver.clients.forEach((client) => {
+        //                 sendJSON(client, {command: "delete_bullet", data: {id: bullet.id}})
+        //             })
+        //             break;
+        //         }
+        //     }
+        //     if (bullet_hit) {
+        //         continue;
+        //     }
+
+        //     websocketserver.clients.forEach((client) => {
+        //         sendJSON(client, {command: "update_bullet", data: {id: bullet.id, x: bullet.x, y: bullet.y}})
+        //     })
+        // }
+
+        for (let bomb of bombs) {
+            if (bomb.framesTilBlow === 0) {
+                console.log('explode')
             }
-
-
-            let bullet_hit = false;
-            for (let player of Object.values(players)) {
-                if (player.id != bullet.playerID && bullet.x + bullet.radius > player.x && bullet.x < player.x + player.width && bullet.y < player.y + player.height && bullet.y + bullet.radius > player.y) {
-                    bullet_hit = true;
-                    player.hp -= 2;
-
-                    if (player.hp <= 0) {
-                        websocketserver.clients.forEach((client) => {
-                            sendJSON(client, {command: "alert", data: {message: "player died"}})
-                        })
-                    }
-                    delete bullets[bullet.id];
-                    websocketserver.clients.forEach((client) => {
-                        sendJSON(client, {command: "delete_bullet", data: {id: bullet.id}})
-                    })
-                    break;
-                }
-            }
-            if (bullet_hit) {
-                continue;
-            }
-
-            websocketserver.clients.forEach((client) => {
-                sendJSON(client, {command: "update_bullet", data: {id: bullet.id, x: bullet.x, y: bullet.y}})
-            })
+            bomb.framesTilBlow--;
         }
     }
     
@@ -286,6 +296,16 @@ class Bullet {
         this.velx = velx;
         this.vely = vely;
         this.playerID = playerid;
+    }
+}
+
+class Bomb {
+    static damage = 1;
+    constructor(x, y) {
+        this.x = x;
+        this.y = y;
+        this.sideLength = 30;
+        this.framesTilBlow = 120;
     }
 }
 
