@@ -2,8 +2,6 @@ const express = require('express');
 const { tugofwarserver } = require('./tugwar');
 const { gungameserver } = require('./gungame/gungameserver');
 const useragent = require('express-useragent')
-require('dotenv').config()
-console.log(process.env)
 
 const webserver = express()
 
