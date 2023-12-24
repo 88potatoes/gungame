@@ -26,9 +26,9 @@ function gungameserver() {
 
     let bullet_id = 0;
 
-    const pss = new XSocketServer({ port: 8083 });
+    // const pss = new XSocketServer({ port: 8083 });
 
-    handle_event(registered_events, 'move-left', (ws) => {
+    xsocketserver.register_events("phone", "move-left", (ws) => {
         current_player = players[ws.id];
 
         // detecting future collision
@@ -56,6 +56,35 @@ function gungameserver() {
             sendJSON(desktop, {command: "move-hor", data: {player: ws.id, x: current_player.x}})
         }
     })
+    
+    // handle_event(registered_events, 'move-left', (ws) => {
+    //     current_player = players[ws.id];
+
+    //     // detecting future collision
+    //     let future_x = max(0, current_player.x - SPEED);
+
+    //     for (let player of Object.values(players)) {
+    //         if (player == current_player) {
+    //             continue;
+    //         }
+    //         if (current_player.y < player.y + player.height && current_player.y + current_player.height > player.y && current_player.x >= player.x + player.width) {
+    //             future_x = max(player.x + player.width, future_x)
+    //         }
+    //     }
+
+    //     // collisions with blocks
+    //     for (let wall of walls) {
+    //         if (current_player.y < wall.y + wall.sideLength && current_player.y + current_player.width > wall.y && current_player.x >= wall.x + wall.sideLength) {
+    //             future_x = max(wall.x + wall.sideLength, future_x)
+    //         }
+    //     }
+
+    //     current_player.x = future_x;
+
+    //     for (let desktop of Object.values(desktops)) {
+    //         sendJSON(desktop, {command: "move-hor", data: {player: ws.id, x: current_player.x}})
+    //     }
+    // })
 
     handle_event(registered_events, 'move-right', (ws) => {
         current_player = players[ws.id];

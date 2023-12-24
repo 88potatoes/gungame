@@ -87,6 +87,7 @@ handle_event(registered_events, 'disconnect', (data) => {
 })
 
 handle_event(registered_events, 'move-hor', (data) => {
+    console.log('movign hor')
     players[data.player].x = data.x;
     playerElements[data.player].style.left = `${data.x}px`;
 })
