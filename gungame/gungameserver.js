@@ -138,21 +138,6 @@ function gungameserver() {
         }
     })
 
-    // handle_event(registered_events, 'shoot', (ws, data) => {
-    //     let player = players[ws.id];
-    //     let dx = data.x - player.x;
-    //     let dy = data.y - player.y;
-    //     let d = Math.sqrt(dx*dx + dy*dy)
-    //     let velx = dx/d * BULLET_SPEED;
-    //     let vely = dy/d * BULLET_SPEED;
-    //     bullets[bullet_id] = new Bullet(bullet_id, player.x + player.width / 2, player.y + player.height /2, velx, vely, ws.id);
-    //     websocketserver.clients.forEach((client) => {
-    //         sendJSON(client, {command: 'init_bullet', data: bullets[bullet_id]})
-    //     })
-
-    //     bullet_id++;
-    // })
-
     handle_event(registered_events, 'phone_join', (ws, data) => {
         ws.device = 'phone'
         if (!ws.alreadyConnected) {
@@ -227,46 +212,6 @@ function gungameserver() {
     })
 
     function update() {
-        // no more need for bullets
-        // for (let bullet of Object.values(bullets)) {
-        //     bullet.x += bullet.velx;
-        //     bullet.y += bullet.vely;
-        //     if (bullet.x > 640 || bullet.x < 0 || bullet.y > 640 || bullet.y < 0) {
-        //         delete bullets[bullet.id];
-        //         websocketserver.clients.forEach((client) => {
-        //             sendJSON(client, {command: "delete_bullet", data: {id: bullet.id}})
-        //         })
-        //         continue;
-        //     }
-
-
-        //     let bullet_hit = false;
-        //     for (let player of Object.values(players)) {
-        //         if (player.id != bullet.playerID && bullet.x + bullet.radius > player.x && bullet.x < player.x + player.width && bullet.y < player.y + player.height && bullet.y + bullet.radius > player.y) {
-        //             bullet_hit = true;
-        //             player.hp -= 2;
-
-        //             if (player.hp <= 0) {
-        //                 websocketserver.clients.forEach((client) => {
-        //                     sendJSON(client, {command: "alert", data: {message: "player died"}})
-        //                 })
-        //             }
-        //             delete bullets[bullet.id];
-        //             websocketserver.clients.forEach((client) => {
-        //                 sendJSON(client, {command: "delete_bullet", data: {id: bullet.id}})
-        //             })
-        //             break;
-        //         }
-        //     }
-        //     if (bullet_hit) {
-        //         continue;
-        //     }
-
-        //     websocketserver.clients.forEach((client) => {
-        //         sendJSON(client, {command: "update_bullet", data: {id: bullet.id, x: bullet.x, y: bullet.y}})
-        //     })
-        // }
-
         for (let bomb of Object.values(bombs)) {
             if (bomb.framesTilBlow === 0) {
                 console.log('explode')
