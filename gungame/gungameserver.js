@@ -56,7 +56,7 @@ function gungameserver() {
             sendJSON(desktop, {command: "move-hor", data: {player: ws.id, x: current_player.x}})
         }
     })
-    
+
     // handle_event(registered_events, 'move-left', (ws) => {
     //     current_player = players[ws.id];
 
@@ -196,47 +196,21 @@ function gungameserver() {
         }
     })
 
+    xsocketserver.onconnect = (ws, req) => {
+        if (ws.ip in latent_players) {
+            let player = latent_players[ws.ip]
+            delete latent_players[ws.ip]
+            players[player.id] = player;
+            ws.id = player.id
+            ws.alreadyConnected = true;
+        } else {
+            players[ws.id] = new Player(ws.id, ws.ip)
+        }
+    }
+
     // websocketserver.on('connection', (ws, req) => {
-    //     const ip = req.socket.remoteAddress;
-    //     ws.ip = ip;
-    //     ws.alreadyConnected = false;
-        
-    //     if (ws.ip in latent_players) {
-    //         let player = latent_players[ws.ip]
-    //         delete latent_players[ws.ip]
-    //         players[player.id] = player;
-    //         ws.id = player.id
-    //         ws.alreadyConnected = true;
-    //     } else {
-    //         ws.id = get_id();
-    //     }
-    //     // to determine device - is set in 'desktop_join' and 'phone_join' event
-    //     ws.device = null;
-    //     console.log('connected', ws.ip, ws.id);
 
-    //     ws.onclose = () => {
-    //         console.log('disconnected', ws.id)
-    //         if (ws.device === 'phone') {
-    //             latent_players[ws.ip] = players[ws.id]
-    //             delete players[ws.id]
-    //         }
-    //         console.log(latent_players)
-    //         // websocketserver.clients.forEach((client) => {
-    //         //     sendJSON(client, {command: "disconnect", data: {player: ws.id}})
-    //         // })
-    //     }
 
-    //     ws.onerror = () => {
-    //         console.log("websocket error")
-    //     }
-
-    //     ws.onmessage = (message) => {
-    //         const [command, data] = parseJSON(message.data)
-            
-    //         if (command in registered_events) {
-    //             registered_events[command](ws, data);
-    //         }
-    //     }
     // })
 
     function update() {

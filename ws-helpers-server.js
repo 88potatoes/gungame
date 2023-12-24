@@ -24,6 +24,10 @@ class XSocketServer extends WebSocketServer {
             }
         };
         this.state = {}
+
+        // custom on-connect functionality
+        this.onconnect = null;
+
         this.on('connection', (ws, req) => {
             ws.id = get_id();
             ws.ip = req.socket.remoteAddress;
@@ -38,6 +42,10 @@ class XSocketServer extends WebSocketServer {
             // } else {
             //     ws.id = get_id();
             // }
+
+            if (this.onconnect != null) {
+                this.onconnect(ws, req)
+            }
 
             // to determine device - is set in 'desktop_join' and 'phone_join' event
             ws.device = null;
