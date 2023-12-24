@@ -9,12 +9,6 @@ let godown = false;
 let goright = false;
 let goleft = false;
 
-websocket.onopen = () => {
-    // sendJSON(websocket, {command: 'phone_join'})
-    ws_send(websocket, "phone_join")
-    console.log('phone_join event')
-}
-
 const upbutton = document.getElementById('upbutton');
 upbutton.addEventListener('touchstart', (e) => {
     e.preventDefault();

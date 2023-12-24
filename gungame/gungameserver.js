@@ -1,6 +1,6 @@
 const { WebSocketServer } = require('ws');
 const { XSocketServer } = require('../ws-helpers-server')
-const { handle_event, get_id, parseJSON, sendJSON } = require('../ws-helpers');
+const { handle_event, get_id, parseJSON, sendJSON, ws_send } = require('../ws-helpers');
 const useragent = require('express-useragent')
 
 function gungameserver() {
@@ -8,7 +8,6 @@ function gungameserver() {
     const FPS = 60;
 
     console.log('run gungameserver')
-    // const websocketserver = new WebSocketServer({ port: 8082 });
     const xsocketserver = new XSocketServer({port: 8082});
 
     const players = {}
@@ -25,11 +24,7 @@ function gungameserver() {
         0: new Bomb(0, 0, 1)
     };
 
-    let bullet_id = 0;
-
-    // const pss = new XSocketServer({ port: 8083 });
-
-    xsocketserver.register_events("phone", "move-left", (ws) => {
+    xsocketserver.register_event("phone", "move-left", (ws) => {
         current_player = players[ws.id];
 
         // detecting future collision
@@ -53,41 +48,10 @@ function gungameserver() {
 
         current_player.x = future_x;
 
-        for (let desktop of Object.values(desktops)) {
-            sendJSON(desktop, {command: "move-hor", data: {player: ws.id, x: current_player.x}})
-        }
+        xsocketserver.broadcast_desktops("move-hor", {player: ws.id, x: current_player.x})
     })
 
-    // handle_event(registered_events, 'move-left', (ws) => {
-    //     current_player = players[ws.id];
-
-    //     // detecting future collision
-    //     let future_x = max(0, current_player.x - SPEED);
-
-    //     for (let player of Object.values(players)) {
-    //         if (player == current_player) {
-    //             continue;
-    //         }
-    //         if (current_player.y < player.y + player.height && current_player.y + current_player.height > player.y && current_player.x >= player.x + player.width) {
-    //             future_x = max(player.x + player.width, future_x)
-    //         }
-    //     }
-
-    //     // collisions with blocks
-    //     for (let wall of walls) {
-    //         if (current_player.y < wall.y + wall.sideLength && current_player.y + current_player.width > wall.y && current_player.x >= wall.x + wall.sideLength) {
-    //             future_x = max(wall.x + wall.sideLength, future_x)
-    //         }
-    //     }
-
-    //     current_player.x = future_x;
-
-    //     for (let desktop of Object.values(desktops)) {
-    //         sendJSON(desktop, {command: "move-hor", data: {player: ws.id, x: current_player.x}})
-    //     }
-    // })
-
-    handle_event(registered_events, 'move-right', (ws) => {
+    xsocketserver.register_event('phone', 'move-right', (ws) => {
         current_player = players[ws.id];
         let future_x = min(640 - current_player.width, current_player.x + SPEED);
 
@@ -108,15 +72,14 @@ function gungameserver() {
 
         current_player.x = future_x;
 
-        for (let desktop of Object.values(desktops)) {
-            sendJSON(desktop, {command: "move-hor", data: {player: ws.id, x: current_player.x}})
-        }
+        xsocketserver.broadcast_desktops("move-hor", {player: ws.id, x: current_player.x})
+
     })
 
-    handle_event(registered_events, 'move-up', (ws) => {
+    xsocketserver.register_event('phone', 'move-up', (ws) => {
         current_player = players[ws.id];
         let future_y = max(0, current_player.y - SPEED);
-
+        
         // collisions with other players
         for (let player of Object.values(players)) {
             if (player == current_player) {
@@ -126,22 +89,20 @@ function gungameserver() {
                 future_y = max(player.y + player.height, future_y)
             }
         }
-
+        
         // collisions with blocks
         for (let wall of walls) {
             if (current_player.x < wall.x + wall.sideLength && current_player.x + current_player.width > wall.x && current_player.y >= wall.y + wall.sideLength) {
                 future_y = max(wall.y + wall.sideLength, future_y)
             }
         }
-
+        
         current_player.y = future_y;
-
-        for (let desktop of Object.values(desktops)) {
-            sendJSON(desktop, {command: "move-ver", data: { player: ws.id, y: current_player.y}})
-        }
+        
+        xsocketserver.broadcast_desktops("move-ver", { player: ws.id, y: current_player.y})
     })
-
-    handle_event(registered_events, 'move-down', (ws) => {
+    
+    xsocketserver.register_event('phone', 'move-down', (ws) => {
         current_player = players[ws.id];
         let future_y = min(640 - current_player.height, current_player.y + SPEED);
 
@@ -162,20 +123,7 @@ function gungameserver() {
 
         current_player.y = future_y;
 
-        for (let desktop of Object.values(desktops)) {
-            sendJSON(desktop, {command: "move-ver", data: {player: ws.id, y: current_player.y}})
-        }
-    })
-
-    handle_event(registered_events, 'phone_join', (ws, data) => {
-        ws.device = 'phone'
-        if (!ws.alreadyConnected) {
-            players[ws.id] = new Player(ws.id, ws.ip);
-            
-            for (let desktop of Object.values(desktops)) {
-                sendJSON(desktop, {command: "add_player", data: {[ws.id]: players[ws.id]}})
-            }
-        }
+        xsocketserver.broadcast_desktops("move-ver", { player: ws.id, y: current_player.y})
     })
 
     handle_event(registered_events, 'drop-bomb', (ws, data) => {
@@ -184,9 +132,7 @@ function gungameserver() {
         const bomb = new Bomb(player.x + player.width / 2 - Bomb.sideLength / 2, player.y + player.height / 2 - Bomb.sideLength / 2, bombid)
         bombs[bombid] = bomb
         
-        for (let desktop of Object.values(desktops)) {
-            sendJSON(desktop, {command: 'create_bomb', data: {x: bomb.x, y: bomb.y, sideLength: Bomb.sideLength, id: bomb.id}})
-        }
+        // xsocketserver.broadcast_desktops("move-ver", { player: ws.id, y: current_player.y})
     })
 
     xsocketserver.onconnect = (ws, req) => {

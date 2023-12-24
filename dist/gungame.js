@@ -110,13 +110,17 @@ handle_event(registered_events, 'disconnect', (data) => {
     delete lobbyElements[data.player]
 })
 
-handle_event(registered_events, 'move-hor', (data) => {
-    console.log('movign hor')
+desksocket.register_event('move-hor', (data) => {
     players[data.player].x = data.x;
     playerElements[data.player].style.left = `${data.x}px`;
 })
+// handle_event(registered_events, 'move-hor', (data) => {
+//     console.log('movign hor')
+//     players[data.player].x = data.x;
+//     playerElements[data.player].style.left = `${data.x}px`;
+// })
 
-handle_event(registered_events, 'move-ver', (data) => {
+desksocket.register_event('move-ver', (data) => {
     players[data.player].y = data.y
     playerElements[data.player].style.top = `${data.y}px`;
 })

@@ -64,7 +64,7 @@ class XSocketServer extends WebSocketServer {
         })
     }
 
-    register_events(device, event, callback) {
+    register_event(device, event, callback) {
         if (device === 'phone') {
             this.phone_events[event] = callback;
         } else if (device === 'desktop') {
