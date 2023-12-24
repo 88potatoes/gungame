@@ -1,6 +1,7 @@
 const { WebSocketServer } = require('ws');
 const { XSocketServer } = require('../ws-helpers-server')
 const { handle_event, get_id, parseJSON, sendJSON } = require('../ws-helpers');
+const useragent = require('express-useragent')
 
 function gungameserver() {
     const SPEED = 5;
@@ -177,13 +178,22 @@ function gungameserver() {
         }
     })
 
-    handle_event(registered_events, 'desktop_join', (ws, data) => {
+    xsocketserver.register_events('desktop', 'desktop_join', (ws, data) => {
         ws.device = 'desktop'
         desktops[ws.id] = ws;
         // send all player data
+        console.log("desktop joined")
         sendJSON(ws, {command: "init_players", data: players});
         sendJSON(ws, {command: "init_walls", data: walls});
     })
+
+    // handle_event(registered_events, 'desktop_join', (ws, data) => {
+    //     ws.device = 'desktop'
+    //     desktops[ws.id] = ws;
+    //     // send all player data
+    //     sendJSON(ws, {command: "init_players", data: players});
+    //     sendJSON(ws, {command: "init_walls", data: walls});
+    // })
 
     handle_event(registered_events, 'drop-bomb', (ws, data) => {
         const bombid = get_id();
@@ -197,14 +207,19 @@ function gungameserver() {
     })
 
     xsocketserver.onconnect = (ws, req) => {
-        if (ws.ip in latent_players) {
-            let player = latent_players[ws.ip]
-            delete latent_players[ws.ip]
-            players[player.id] = player;
-            ws.id = player.id
-            ws.alreadyConnected = true;
+        if (ws.device === "desktop") {
+            sendJSON(ws, {command: "init_players", data: players});
+            sendJSON(ws, {command: "init_walls", data: walls});
         } else {
-            players[ws.id] = new Player(ws.id, ws.ip)
+            if (ws.ip in latent_players) {
+                let player = latent_players[ws.ip]
+                delete latent_players[ws.ip]
+                players[player.id] = player;
+                ws.id = player.id
+                ws.alreadyConnected = true;
+            } else {
+                players[ws.id] = new Player(ws.id, ws.ip)
+            }
         }
     }
 

@@ -6,6 +6,7 @@ const {
     get_id,
     ws_send
 } = require('./ws-helpers')
+const useragent = require('express-useragent')
 
 class XSocketServer extends WebSocketServer {
     constructor(...options) {
@@ -32,35 +33,17 @@ class XSocketServer extends WebSocketServer {
             ws.id = get_id();
             ws.ip = req.socket.remoteAddress;
             ws.alreadyConnected = false;
-        
-            // if (ws.ip in this.latent_players) {
-            //     let player = this.latent_players[ws.ip]
-            //     delete latent_players[ws.ip]
-            //     players[player.id] = player;
-            //     ws.id = player.id
-            //     ws.alreadyConnected = true;
-            // } else {
-            //     ws.id = get_id();
-            // }
+            ws.device = useragent.parse(req.headers['user-agent']).isMobile ? "phone" : "desktop";
 
             if (this.onconnect != null) {
                 this.onconnect(ws, req)
             }
 
             // to determine device - is set in 'desktop_join' and 'phone_join' event
-            ws.device = null;
             console.log('connected', ws.ip, ws.id);
 
             ws.onclose = () => {
                 console.log('disconnected', ws.id)
-                // if (ws.device === 'phone') {
-                //     latent_players[ws.ip] = players[ws.id]
-                //     delete players[ws.id]
-                // }
-                // console.log(latent_players)
-                // websocketserver.clients.forEach((client) => {
-                //     sendJSON(client, {command: "disconnect", data: {player: ws.id}})
-                // })
             }
 
             ws.onerror = () => {
@@ -70,12 +53,7 @@ class XSocketServer extends WebSocketServer {
             ws.onmessage = (message) => {
                 const [command, data] = parseJSON(message.data)
                 
-                // if device is neither phone nor desktop then it doesn't do anything
-                if (ws.device === null) {
-                    // to register device
-                    console.log(command)
-                    this.device_register_events[command](ws, data);
-                } else if (ws.device === 'phone') {
+                if (ws.device === 'phone') {
                     if (command in this.phone_events) {
                         this.phone_events[command](ws, data);
                     }
@@ -86,8 +64,6 @@ class XSocketServer extends WebSocketServer {
                 }
             }
         })
-        
-        console.log(this)
     }
 
     register_events(device, event, callback) {

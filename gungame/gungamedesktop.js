@@ -2,6 +2,7 @@ const canvas = document.getElementById('canv');
 const playerListElement = document.getElementById('playerlist')
 const { sendJSON, handle_event, parseJSON } = require('../ws-helpers.js')
 const info = require('../info.json')
+const { XSocketClient } = require('../ws-helpers-client.js')
 
 console.log(info);
 
@@ -10,8 +11,8 @@ console.log(info);
 // DON'T need anymore
 
 // const websocket = new WebSocket('ws://localhost:8082')
+const desksocket = new XSocketClient("desktop", `ws://${info.ip_address}:8082`)
 console.log('after loading websocket')
-const websocket = new WebSocket(`ws://${info.ip_address}:8082`)
 
 const registered_events = {}
 let players = {}
@@ -22,21 +23,8 @@ let lobbyElements = {}
 let bombElements = {}
 // let wallElements = []
 
-websocket.onopen = () => {
-    sendJSON(websocket, {command: "desktop_join"})
-}
-
-
-websocket.onmessage = (event) => {
-    const [command, data] = parseJSON(event.data);
-    
-    if (command in registered_events) {
-        registered_events[command](data)
-    }
-}
-
 // initialise all players initially
-handle_event(registered_events, 'init_players', (data) => {
+desksocket.register_event("init_players", (data) => {
     players = data;
     console.log("init players", Object.values(players))
 
@@ -54,6 +42,24 @@ handle_event(registered_events, 'init_players', (data) => {
         playerListElement.appendChild(lobbyElement)
     }
 })
+// handle_event(registered_events, 'init_players', (data) => {
+//     players = data;
+//     console.log("init players", Object.values(players))
+
+//     for (let player of Object.values(players)) {
+//         // console.log(player)
+//         let playerEl = document.createElement('div');
+//         playerEl.style = `position: absolute; background: red; width: ${player.width}px; height: ${player.height}px; left: ${player.x}px; top: ${player.y}px;`;
+//         playerElements[player.id] = playerEl;
+//         canvas.appendChild(playerElements[player.id]);
+
+//         // for lobby
+//         const lobbyElement = document.createElement('li');
+//         lobbyElement.innerText = `Player ${player.id}`;
+//         lobbyElements[player.id] = lobbyElement;
+//         playerListElement.appendChild(lobbyElement)
+//     }
+// })
 
 // add a new player upon connection
 handle_event(registered_events, 'add_player', (data) => {
