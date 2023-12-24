@@ -159,7 +159,7 @@ function get_id() {
     return id_generator.next().value;
 }
 
-class PhoneSocketServer extends WebSocketServer {
+class XSocketServer extends WebSocketServer {
     constructor(options) {
         super(options)
         this.phone_events = {};
@@ -237,12 +237,35 @@ class PhoneSocketServer extends WebSocketServer {
     
 }
 
+class XSocketClient extends WebSocket {
+    constructor(type, ...args) {
+        super(...args)
+        console.assert(type == 'phone' || type == 'desktop')
+        this.type = type;
+        this.events = {}  
+        this.onopen = () => {
+            ws_send(this, "device_register", this.type)
+        }
+        this.onmessage = (event) => {
+            const [command, data] = parseJSON(event)
+            if (command in this.events) {
+                this.events[command](data)
+            }
+
+        }      
+    }   
+
+    register_event = (event, callback) => {
+        this.events[event] = callback;
+    }
+}
+
 module.exports = {
     sendJSON,
     handle_event,
     parseJSON,
     get_id,
     ws_send,
-    PhoneSocketServer
+    XSocketServer
 }
 },{"ws":3}]},{},[1]);

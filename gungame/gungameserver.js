@@ -1,6 +1,6 @@
 const { WebSocketServer } = require('ws');
 
-const { handle_event, get_id, parseJSON, sendJSON, PhoneSocketServer } = require('../ws-helpers');
+const { handle_event, get_id, parseJSON, sendJSON, XSocketServer } = require('../ws-helpers');
 
 function gungameserver() {
     const SPEED = 5;
@@ -27,7 +27,7 @@ function gungameserver() {
 
     let bullet_id = 0;
 
-    const pss = new PhoneSocketServer({ port: 8083 });
+    const pss = new XSocketServer({ port: 8083 });
 
     handle_event(registered_events, 'move-left', (ws) => {
         current_player = players[ws.id];
