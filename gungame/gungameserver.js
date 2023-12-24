@@ -1,17 +1,17 @@
 const { WebSocketServer } = require('ws');
-const { handle_event, get_id, parseJSON, sendJSON, XSocketServer } = require('../ws-helpers');
+const { XSocketServer } = require('../ws-helpers-server')
+const { handle_event, get_id, parseJSON, sendJSON } = require('../ws-helpers');
 
 function gungameserver() {
     const SPEED = 5;
-    const BULLET_SPEED = 10;
     const FPS = 60;
 
     console.log('run gungameserver')
-    const websocketserver = new WebSocketServer({ port: 8082 });
+    // const websocketserver = new WebSocketServer({ port: 8082 });
+    const xsocketserver = new XSocketServer({port: 8082});
 
     const players = {}
     const latent_players = {}
-    const bullets = {}
     const registered_events = {}
     const desktops = {}
     const walls = [
@@ -167,48 +167,48 @@ function gungameserver() {
         }
     })
 
-    websocketserver.on('connection', (ws, req) => {
-        const ip = req.socket.remoteAddress;
-        ws.ip = ip;
-        ws.alreadyConnected = false;
+    // websocketserver.on('connection', (ws, req) => {
+    //     const ip = req.socket.remoteAddress;
+    //     ws.ip = ip;
+    //     ws.alreadyConnected = false;
         
-        if (ws.ip in latent_players) {
-            let player = latent_players[ws.ip]
-            delete latent_players[ws.ip]
-            players[player.id] = player;
-            ws.id = player.id
-            ws.alreadyConnected = true;
-        } else {
-            ws.id = get_id();
-        }
-        // to determine device - is set in 'desktop_join' and 'phone_join' event
-        ws.device = null;
-        console.log('connected', ws.ip, ws.id);
+    //     if (ws.ip in latent_players) {
+    //         let player = latent_players[ws.ip]
+    //         delete latent_players[ws.ip]
+    //         players[player.id] = player;
+    //         ws.id = player.id
+    //         ws.alreadyConnected = true;
+    //     } else {
+    //         ws.id = get_id();
+    //     }
+    //     // to determine device - is set in 'desktop_join' and 'phone_join' event
+    //     ws.device = null;
+    //     console.log('connected', ws.ip, ws.id);
 
-        ws.onclose = () => {
-            console.log('disconnected', ws.id)
-            if (ws.device === 'phone') {
-                latent_players[ws.ip] = players[ws.id]
-                delete players[ws.id]
-            }
-            console.log(latent_players)
-            // websocketserver.clients.forEach((client) => {
-            //     sendJSON(client, {command: "disconnect", data: {player: ws.id}})
-            // })
-        }
+    //     ws.onclose = () => {
+    //         console.log('disconnected', ws.id)
+    //         if (ws.device === 'phone') {
+    //             latent_players[ws.ip] = players[ws.id]
+    //             delete players[ws.id]
+    //         }
+    //         console.log(latent_players)
+    //         // websocketserver.clients.forEach((client) => {
+    //         //     sendJSON(client, {command: "disconnect", data: {player: ws.id}})
+    //         // })
+    //     }
 
-        ws.onerror = () => {
-            console.log("websocket error")
-        }
+    //     ws.onerror = () => {
+    //         console.log("websocket error")
+    //     }
 
-        ws.onmessage = (message) => {
-            const [command, data] = parseJSON(message.data)
+    //     ws.onmessage = (message) => {
+    //         const [command, data] = parseJSON(message.data)
             
-            if (command in registered_events) {
-                registered_events[command](ws, data);
-            }
-        }
-    })
+    //         if (command in registered_events) {
+    //             registered_events[command](ws, data);
+    //         }
+    //     }
+    // })
 
     function update() {
         for (let bomb of Object.values(bombs)) {
