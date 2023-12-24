@@ -42,24 +42,6 @@ desksocket.register_event("init_players", (data) => {
         playerListElement.appendChild(lobbyElement)
     }
 })
-// handle_event(registered_events, 'init_players', (data) => {
-//     players = data;
-//     console.log("init players", Object.values(players))
-
-//     for (let player of Object.values(players)) {
-//         // console.log(player)
-//         let playerEl = document.createElement('div');
-//         playerEl.style = `position: absolute; background: red; width: ${player.width}px; height: ${player.height}px; left: ${player.x}px; top: ${player.y}px;`;
-//         playerElements[player.id] = playerEl;
-//         canvas.appendChild(playerElements[player.id]);
-
-//         // for lobby
-//         const lobbyElement = document.createElement('l);
-//         lobbyElement.innerText = `Player ${player.id}`;
-//         lobbyElements[player.id] = lobbyElement;
-//         playerListElement.appendChild(lobbyElement)
-//     }
-// })
 
 // add a new player upon connection
 desksocket.register_event('add_player', (data) => {
@@ -80,26 +62,9 @@ desksocket.register_event('add_player', (data) => {
     lobbyElements[player.id] = lobbyElement;
     playerListElement.appendChild(lobbyElement)
 })
-// handle_event(registered_events, 'add_player', (data) => {
-//     const player = Object.values(data)[0];
-//     players = {...players, [player.id]: player }
-//     console.log("players", players)
-
-//     let playerEl = document.createElement('div');
-//     playerEl.style = `position: absolute; background: red; width: ${player.width}px; height: ${player.height}px; left: ${player.x}px; top: ${player.y}px;`;
-//     playerEl.id = `p${player.id}`
-//     playerElements[player.id] = playerEl;
-//     canvas.appendChild(playerElements[player.id]);
-
-//     // for lobby
-//     const lobbyElement = document.createElement('li');
-//     lobbyElement.innerText = `Player ${player.id}`;
-//     lobbyElements[player.id] = lobbyElement;
-//     playerListElement.appendChild(lobbyElement)
-// })
 
 //handle disconnect event
-handle_event(registered_events, 'disconnect', (data) => {
+desksocket.register_event('disconnect', (data) => {
     delete players[data.player]
     canvas.removeChild(playerElements[data.player])
     delete playerElements[data.player]
@@ -124,24 +89,11 @@ desksocket.register_event('move-ver', (data) => {
     playerElements[data.player].style.top = `${data.y}px`;
 })
 
-handle_event(registered_events, 'init_bullet', (data) => {
-    // console.log(data)
-    let current_bullet = data;
-    bullets[data.id] = data;
-    // console.log(bullets)
-
-    let bulletElement = document.createElement('div')
-    bulletElement.style = `position: absolute; background: green; width: ${current_bullet.radius}px; height: ${current_bullet.radius}px; left: ${current_bullet.x}px; top: ${current_bullet.y}px;` 
-
-    bulletElements[data.id] = bulletElement;
-    canvas.appendChild(bulletElements[data.id]);
-})
-
-handle_event(registered_events, 'alert', (data) => {
+desksocket.register_event('alert', (data) => {
     alert(data.message)
 })
 
-handle_event(registered_events, 'init_walls', (data) => {
+desksocket.register_event('init_walls', (data) => {
     for (let wall of data) {
         let wallElement = document.createElement('div')
         wallElement.style = `position: absolute; background: blue; width: ${wall.sideLength}px; height: ${wall.sideLength}px; left: ${wall.x}px; top: ${wall.y}px;`
@@ -149,14 +101,14 @@ handle_event(registered_events, 'init_walls', (data) => {
     }
 })
 
-handle_event(registered_events, 'create_bomb', (data) => {
+desksocket.register_event('create_bomb', (data) => {
     const bombElement = document.createElement('div')
     bombElement.style = `position: absolute; background: green; width: ${data.sideLength}px; height: ${data.sideLength}px; left: ${data.x}px; top: ${data.y}px;`
     bombElements[data.id] = bombElement;
     canvas.appendChild(bombElement)
 })
 
-handle_event(registered_events, 'explode_bomb', (data) => {
+desksocket.register_event('explode_bomb', (data) => {
     canvas.removeChild(bombElements[data.id]);
     delete bombElements[data.id]
 })
