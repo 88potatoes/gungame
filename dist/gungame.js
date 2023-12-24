@@ -148,7 +148,7 @@ handle_event(registered_events, 'explode_bomb', (data) => {
 
 },{"../info.json":2,"../ws-helpers.js":3}],2:[function(require,module,exports){
 module.exports={
-    "ip_address": "192.168.50.66"
+    "ip_address": "192.168.50.29"
 }
 },{}],3:[function(require,module,exports){
 
@@ -161,6 +161,10 @@ function sendJSON(ws, ...messages) {
     for (let message of messages) {
         ws.send(JSON.stringify(message));
     }
+}
+
+function ws_send(ws, event, payload) {
+    ws.send(JSON.stringify({"command": event, "data": payload}))
 }
 
 function handle_event(event_dict, event, callback) {
@@ -193,6 +197,7 @@ module.exports = {
     sendJSON,
     handle_event,
     parseJSON,
-    get_id
+    get_id,
+    ws_send
 }
 },{}]},{},[1]);

@@ -1,7 +1,8 @@
 (function(){function r(e,n,t){function o(i,f){if(!n[i]){if(!e[i]){var c="function"==typeof require&&require;if(!f&&c)return c(i,!0);if(u)return u(i,!0);var a=new Error("Cannot find module '"+i+"'");throw a.code="MODULE_NOT_FOUND",a}var p=n[i]={exports:{}};e[i][0].call(p.exports,function(r){var n=e[i][1][r];return o(n||r)},p,p.exports,r,e,n,t)}return n[i].exports}for(var u="function"==typeof require&&require,i=0;i<t.length;i++)o(t[i]);return o}return r})()({1:[function(require,module,exports){
-const { sendJSON } = require('../ws-helpers')
+const { sendJSON, ws_send } = require('../ws-helpers')
 const info = require('../info.json')
 const websocket = new WebSocket(`ws://${info.ip_address}:8082`)
+console.log(" ing")
 
 let goup = false;
 let godown = false;
@@ -9,7 +10,8 @@ let goright = false;
 let goleft = false;
 
 websocket.onopen = () => {
-    sendJSON(websocket, {command: 'phone_join'})
+    // sendJSON(websocket, {command: 'phone_join'})
+    ws_send(websocket, "phone_join")
     console.log('phone_join event')
 }
 
@@ -101,7 +103,7 @@ websocket.onclose = (e) => {
 }
 },{"../info.json":2,"../ws-helpers":3}],2:[function(require,module,exports){
 module.exports={
-    "ip_address": "192.168.50.66"
+    "ip_address": "192.168.50.29"
 }
 },{}],3:[function(require,module,exports){
 
@@ -114,6 +116,10 @@ function sendJSON(ws, ...messages) {
     for (let message of messages) {
         ws.send(JSON.stringify(message));
     }
+}
+
+function ws_send(ws, event, payload) {
+    ws.send(JSON.stringify({"command": event, "data": payload}))
 }
 
 function handle_event(event_dict, event, callback) {
@@ -146,6 +152,7 @@ module.exports = {
     sendJSON,
     handle_event,
     parseJSON,
-    get_id
+    get_id,
+    ws_send
 }
 },{}]},{},[1]);

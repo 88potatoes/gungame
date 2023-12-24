@@ -10,6 +10,10 @@ function sendJSON(ws, ...messages) {
     }
 }
 
+function ws_send(ws, event, payload) {
+    ws.send(JSON.stringify({"command": event, "data": payload}))
+}
+
 function handle_event(event_dict, event, callback) {
     event_dict[event] = callback;
 }
@@ -40,5 +44,6 @@ module.exports = {
     sendJSON,
     handle_event,
     parseJSON,
-    get_id
+    get_id,
+    ws_send
 }

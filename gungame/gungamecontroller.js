@@ -1,6 +1,7 @@
-const { sendJSON } = require('../ws-helpers')
+const { sendJSON, ws_send } = require('../ws-helpers')
 const info = require('../info.json')
 const websocket = new WebSocket(`ws://${info.ip_address}:8082`)
+console.log(" ing")
 
 let goup = false;
 let godown = false;
@@ -8,7 +9,8 @@ let goright = false;
 let goleft = false;
 
 websocket.onopen = () => {
-    sendJSON(websocket, {command: 'phone_join'})
+    // sendJSON(websocket, {command: 'phone_join'})
+    ws_send(websocket, "phone_join")
     console.log('phone_join event')
 }
 
