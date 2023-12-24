@@ -128,12 +128,15 @@ function gungameserver() {
 
 
     xsocketserver.register_event('phone', 'drop-bomb', (ws, data) => {
+        console.log(ws.id)
         const bombid = get_id();
         const player = players[ws.id]
+        console.log(player)
         const bomb = new Bomb(player.x + player.width / 2 - Bomb.sideLength / 2, player.y + player.height / 2 - Bomb.sideLength / 2, bombid)
+        console.log(bomb)
         bombs[bombid] = bomb
         
-        // xsocketserver.broadcast_desktops("move-ver", { player: ws.id, y: current_player.y})
+        xsocketserver.broadcast_desktops("create_bomb", {...bomb, "sideLength": Bomb.sideLength})
     })
 
     xsocketserver.onconnect = (ws, req) => {

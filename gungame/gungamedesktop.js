@@ -102,6 +102,7 @@ desksocket.register_event('init_walls', (data) => {
 })
 
 desksocket.register_event('create_bomb', (data) => {
+    console.log(data)
     const bombElement = document.createElement('div')
     bombElement.style = `position: absolute; background: green; width: ${data.sideLength}px; height: ${data.sideLength}px; left: ${data.x}px; top: ${data.y}px;`
     bombElements[data.id] = bombElement;
