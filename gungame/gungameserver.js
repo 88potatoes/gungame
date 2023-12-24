@@ -126,7 +126,8 @@ function gungameserver() {
         xsocketserver.broadcast_desktops("move-ver", { player: ws.id, y: current_player.y})
     })
 
-    handle_event(registered_events, 'drop-bomb', (ws, data) => {
+
+    xsocketserver.register_event('phone', 'drop-bomb', (ws, data) => {
         const bombid = get_id();
         const player = players[ws.id]
         const bomb = new Bomb(player.x + player.width / 2 - Bomb.sideLength / 2, player.y + player.height / 2 - Bomb.sideLength / 2, bombid)
@@ -148,18 +149,10 @@ function gungameserver() {
                 ws.alreadyConnected = true;
             } else {
                 players[ws.id] = new Player(ws.id, ws.ip);
-            
-                for (let desktop of Object.values(desktops)) {
-                    sendJSON(desktop, {command: "add_player", data: {[ws.id]: players[ws.id]}})
-                }
+                xsocketserver.broadcast_desktops("add_player", {[ws.id]: players[ws.id]});
             }
         }
     }
-
-    // websocketserver.on('connection', (ws, req) => {
-
-
-    // })
 
     function update() {
         for (let bomb of Object.values(bombs)) {
