@@ -1,5 +1,4 @@
 const { WebSocketServer } = require('ws');
-
 const { handle_event, get_id, parseJSON, sendJSON, XSocketServer } = require('../ws-helpers');
 
 function gungameserver() {
