@@ -16,14 +16,6 @@ class XSocketServer extends WebSocketServer {
         this.desk_events = {};
         this.desk_connections = {};
         this.latent_players = {};
-        this.device_register_events = {
-            'phone_join': function(ws) {
-                ws.device = 'phone'
-            },
-            'desktop_join': function(ws) {
-                ws.device = 'desktop'
-            }
-        };
         this.state = {}
 
         // custom on-connect functionality
@@ -34,6 +26,12 @@ class XSocketServer extends WebSocketServer {
             ws.ip = req.socket.remoteAddress;
             ws.alreadyConnected = false;
             ws.device = useragent.parse(req.headers['user-agent']).isMobile ? "phone" : "desktop";
+
+            if (ws.device === 'phone') {
+                this.phone_connections[ws.id] = ws;
+            } else {
+                this.desk_connections[ws.id] = ws;
+            }
 
             if (this.onconnect != null) {
                 this.onconnect(ws, req)
@@ -72,6 +70,20 @@ class XSocketServer extends WebSocketServer {
         } else if (device === 'desktop') {
             this.desk_events[event] = callback;
         }
+    }
+
+    broadcast_desktops(event, data) {
+        for (let desktop of Object.values(this.desk_connections)) {
+            ws_send(desktop, event, data)
+        }
+    }
+
+    broadcast_phones(event, data) {
+        for (let phone of Object.values(this.phone_connections)) {
+            ws_send(phone, event, data)
+        }
+
+        
     }
     
 }
