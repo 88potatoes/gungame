@@ -13,7 +13,7 @@ then in different terminals, run
 
 ```
 npm install
-npx watchify gungame/gungame.js -o dist/gungame.js
+npx watchify gungame/gungamedesktop.js -o dist/gungame.js
 npx watchify gungame/gungamecontroller.js -o dist/gungamecontroller.js
 npx tailwindcss -i src/input.css -o dist/output.css --watch
 npx nodemon server.js

@@ -101,23 +101,11 @@ const dcmessage = document.getElementById('dc-message')
 websocket.onclose = (e) => {
     dcmessage.innerText = 'You have disconnected. Please refresh to rejoin'
 }
-},{"../info.json":2,"../ws-helpers":4}],2:[function(require,module,exports){
+},{"../info.json":2,"../ws-helpers":3}],2:[function(require,module,exports){
 module.exports={
     "ip_address": "192.168.50.29"
 }
 },{}],3:[function(require,module,exports){
-'use strict';
-
-module.exports = function () {
-  throw new Error(
-    'ws does not work in the browser. Browser clients must use the native ' +
-      'WebSocket object'
-  );
-};
-
-},{}],4:[function(require,module,exports){
-const { WebSocketServer } = require("ws");
-
 /**
  * Send JSON(s) through websocket
  * @param {WebSocket} ws 
@@ -166,4 +154,4 @@ module.exports = {
     get_id,
     ws_send
 }
-},{"ws":3}]},{},[1]);
+},{}]},{},[1]);

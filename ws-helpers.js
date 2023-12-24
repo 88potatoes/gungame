@@ -1,5 +1,3 @@
-const { WebSocketServer } = require("ws");
-
 /**
  * Send JSON(s) through websocket
  * @param {WebSocket} ws 

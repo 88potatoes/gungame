@@ -54,7 +54,7 @@ desksocket.register_event("init_players", (data) => {
 //         canvas.appendChild(playerElements[player.id]);
 
 //         // for lobby
-//         const lobbyElement = document.createElement('li');
+//         const lobbyElement = document.createElement('l);
 //         lobbyElement.innerText = `Player ${player.id}`;
 //         lobbyElements[player.id] = lobbyElement;
 //         playerListElement.appendChild(lobbyElement)
@@ -62,7 +62,8 @@ desksocket.register_event("init_players", (data) => {
 // })
 
 // add a new player upon connection
-handle_event(registered_events, 'add_player', (data) => {
+desksocket.register_event('add_player', (data) => {
+    console.log('need to add player')
     const player = Object.values(data)[0];
     players = {...players, [player.id]: player }
     console.log("players", players)
@@ -79,6 +80,23 @@ handle_event(registered_events, 'add_player', (data) => {
     lobbyElements[player.id] = lobbyElement;
     playerListElement.appendChild(lobbyElement)
 })
+// handle_event(registered_events, 'add_player', (data) => {
+//     const player = Object.values(data)[0];
+//     players = {...players, [player.id]: player }
+//     console.log("players", players)
+
+//     let playerEl = document.createElement('div');
+//     playerEl.style = `position: absolute; background: red; width: ${player.width}px; height: ${player.height}px; left: ${player.x}px; top: ${player.y}px;`;
+//     playerEl.id = `p${player.id}`
+//     playerElements[player.id] = playerEl;
+//     canvas.appendChild(playerElements[player.id]);
+
+//     // for lobby
+//     const lobbyElement = document.createElement('li');
+//     lobbyElement.innerText = `Player ${player.id}`;
+//     lobbyElements[player.id] = lobbyElement;
+//     playerListElement.appendChild(lobbyElement)
+// })
 
 //handle disconnect event
 handle_event(registered_events, 'disconnect', (data) => {
@@ -113,19 +131,6 @@ handle_event(registered_events, 'init_bullet', (data) => {
 
     bulletElements[data.id] = bulletElement;
     canvas.appendChild(bulletElements[data.id]);
-})
-
-handle_event(registered_events, 'update_bullet', (data) => {
-    bullets[data.id].x = data.x;
-    bullets[data.id].y = data.y;
-    bulletElements[data.id].style.left = `${data.x}px`;
-    bulletElements[data.id].style.top = `${data.y}px`;
-})
-
-handle_event(registered_events, 'delete_bullet', (data) => {
-    delete bullets[data.id];
-    canvas.removeChild(bulletElements[data.id]);
-    delete bulletElements[data.id];
 })
 
 handle_event(registered_events, 'alert', (data) => {
