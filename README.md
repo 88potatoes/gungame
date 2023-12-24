@@ -8,6 +8,7 @@ for example:
     "ip_address": "192.168.50.66"
 }
 ```
+to get the local ip address on mac, run `ifconfig | grep inet` or windows run `ipconfig /all`
 
 then in different terminals, run 
 
