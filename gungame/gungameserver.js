@@ -188,6 +188,11 @@ function gungameserver() {
         }
     }
 
+    xsocketserver.onclose_extra = (ws) => {
+        latent_players[ws.ip] = players[ws.id];
+        delete players[ws.id];
+    }
+
     xsocketserver.register_event('phone', 'toggle_reset', (ws, data) => {
         players[ws.id].reset_agree = !players[ws.id].reset_agree;
 
@@ -202,6 +207,12 @@ function gungameserver() {
         if (all_agree) {
             xsocketserver.broadcast_phones('reset_state', 'not_ready')
             xsocketserver.broadcast_desktops('newgame', Object.keys(coins))
+
+            // resetting player scores and broadcasting
+            for (let player of Object.values(players)) {
+                player.coins = 0;
+                xsocketserver.broadcast_desktops('change_player_score', {id: player.id, score: player.coins})
+            }
             coins = {}
             coinFrames = 0;
             // reset

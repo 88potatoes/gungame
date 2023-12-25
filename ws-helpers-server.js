@@ -17,6 +17,7 @@ class XSocketServer extends WebSocketServer {
         this.desk_connections = {};
         this.latent_players = {};
         this.state = {}
+        this.onclose_extra = null;
 
         // custom on-connect functionality
         this.onconnect = null;
@@ -42,6 +43,9 @@ class XSocketServer extends WebSocketServer {
 
             ws.onclose = () => {
                 console.log('disconnected', ws.id)
+                if (this.onclose_extra != null) {
+                    this.onclose_extra(ws);
+                }
             }
 
             ws.onerror = () => {
