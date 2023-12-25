@@ -130,6 +130,17 @@ desksocket.register_event('explode_bomb', (data) => {
     delete bombElements[data.id]
 })
 
+desksocket.register_event('init_coins', (data) => {
+    console.log(data)
+    for (let coin of data) {
+        console.log(coin)
+        const coinElement = document.createElement('div')
+        coinElement.id = `coin-${coin.id}`;
+        coinElement.style = `position: absolute; background: green; width: ${coin.side}px; height: ${coin.side}px; left: ${coin.x}px; top: ${coin.y}px;`
+        canvas.appendChild(coinElement)
+    }
+})
+
 },{"../info.json":2,"../ws-helpers-client.js":3,"../ws-helpers.js":4}],2:[function(require,module,exports){
 module.exports={
     "ip_address": "192.168.50.29"

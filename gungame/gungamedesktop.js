@@ -128,3 +128,14 @@ desksocket.register_event('explode_bomb', (data) => {
     canvas.removeChild(bombElements[data.id]);
     delete bombElements[data.id]
 })
+
+desksocket.register_event('init_coins', (data) => {
+    console.log(data)
+    for (let coin of data) {
+        console.log(coin)
+        const coinElement = document.createElement('div')
+        coinElement.id = `coin-${coin.id}`;
+        coinElement.style = `position: absolute; background: green; width: ${coin.side}px; height: ${coin.side}px; left: ${coin.x}px; top: ${coin.y}px;`
+        canvas.appendChild(coinElement)
+    }
+})

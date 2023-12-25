@@ -50,12 +50,7 @@ function gungameserver() {
         current_player.x = future_x;
 
         // get coins
-        for (let coin of Object.values(coins)) {
-            if (collidesWith(current_player, coin.x, coin.y, coin.side, coin.side)) {
-                console.log('got coin')
-                xsocketserver.broadcast_desktops("rm_coin", coin.id)
-            }
-        }
+        collect_coins(current_player);
 
         xsocketserver.broadcast_desktops("move-hor", {player: ws.id, x: current_player.x})
     })
@@ -82,12 +77,7 @@ function gungameserver() {
         current_player.x = future_x;
 
         // get coins
-        for (let coin of Object.values(coins)) {
-            if (collidesWith(current_player, coin.x, coin.y, coin.side, coin.side)) {
-                console.log('got coin')
-                xsocketserver.broadcast_desktops("rm_coin", coin.id)
-            }
-        }
+        collect_coins(current_player);
 
         xsocketserver.broadcast_desktops("move-hor", {player: ws.id, x: current_player.x})
 
@@ -117,12 +107,7 @@ function gungameserver() {
         current_player.y = future_y;
 
         // get coins
-        for (let coin of Object.values(coins)) {
-            if (collidesWith(current_player, coin.x, coin.y, coin.side, coin.side)) {
-                console.log('got coin')
-                xsocketserver.broadcast_desktops("rm_coin", coin.id)
-            }
-        }
+        collect_coins(current_player);
         
         xsocketserver.broadcast_desktops("move-ver", { player: ws.id, y: current_player.y})
     })
@@ -149,12 +134,7 @@ function gungameserver() {
         current_player.y = future_y;
 
         // get coins
-        for (let coin of Object.values(coins)) {
-            if (collidesWith(current_player, coin.x, coin.y, coin.side, coin.side)) {
-                console.log('got coin')
-                xsocketserver.broadcast_desktops("rm_coin", coin.id)
-            }
-        }
+        collect_coins(current_player);
 
         xsocketserver.broadcast_desktops("move-ver", { player: ws.id, y: current_player.y})
     })
@@ -176,6 +156,7 @@ function gungameserver() {
         if (ws.device === "desktop") {
             sendJSON(ws, {command: "init_players", data: players});
             sendJSON(ws, {command: "init_walls", data: walls});
+            sendJSON(ws, {command: "init_coins", data: Object.values(coins)});
         } else {
             if (ws.ip in latent_players) {
                 let player = latent_players[ws.ip]
@@ -217,14 +198,23 @@ function gungameserver() {
         setInterval(update, 1000 / FPS)
     }
 
+    function collect_coins(current_player) {
+        for (let coin of Object.values(coins)) {
+            if (collidesWith(current_player, coin.x, coin.y, coin.side, coin.side)) {
+                console.log('got coin')
+                xsocketserver.broadcast_desktops("rm_coin", coin.id)
+                delete coins[coin.id];
+                current_player.coins++;
+            }
+        }
+    }
+
     run();
 }
 
 function collidesWith(player, ox, oy, ow, oh) {
     return !(player.x + player.width < ox || player.x > ox + ow || player.y > oy + oh || player.y + player.height < oy);
     // if ((current_player.y < wall.y + wall.sideLength && current_player.y + current_player.width > wall.y && current_player.x >= wall.x + wall.sideLength) || (current_player.y < wall.y + wall.sideLength && current_player.y + current_player.height > wall.y && current_player.x + current_player.width <= wall.x) || (current_player.x < wall.x + wall.sideLength && current_player.x + current_player.width > wall.x && current_player.y >= wall.y + wall.sideLength) || (current_player.x < wall.x + wall.sideLength && current_player.x + current_player.width > wall.x && current_player.y + current_player.height <= wall.y))
-
-
 }
 
 class Player {
