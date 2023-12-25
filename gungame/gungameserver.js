@@ -49,6 +49,14 @@ function gungameserver() {
 
         current_player.x = future_x;
 
+        // get coins
+        for (let coin of Object.values(coins)) {
+            if (collidesWith(current_player, coin.x, coin.y, coin.side, coin.side)) {
+                console.log('got coin')
+                xsocketserver.broadcast_desktops("rm_coin", coin.id)
+            }
+        }
+
         xsocketserver.broadcast_desktops("move-hor", {player: ws.id, x: current_player.x})
     })
 
@@ -72,6 +80,14 @@ function gungameserver() {
         }
 
         current_player.x = future_x;
+
+        // get coins
+        for (let coin of Object.values(coins)) {
+            if (collidesWith(current_player, coin.x, coin.y, coin.side, coin.side)) {
+                console.log('got coin')
+                xsocketserver.broadcast_desktops("rm_coin", coin.id)
+            }
+        }
 
         xsocketserver.broadcast_desktops("move-hor", {player: ws.id, x: current_player.x})
 
@@ -99,6 +115,14 @@ function gungameserver() {
         }
         
         current_player.y = future_y;
+
+        // get coins
+        for (let coin of Object.values(coins)) {
+            if (collidesWith(current_player, coin.x, coin.y, coin.side, coin.side)) {
+                console.log('got coin')
+                xsocketserver.broadcast_desktops("rm_coin", coin.id)
+            }
+        }
         
         xsocketserver.broadcast_desktops("move-ver", { player: ws.id, y: current_player.y})
     })
@@ -123,6 +147,14 @@ function gungameserver() {
         }
 
         current_player.y = future_y;
+
+        // get coins
+        for (let coin of Object.values(coins)) {
+            if (collidesWith(current_player, coin.x, coin.y, coin.side, coin.side)) {
+                console.log('got coin')
+                xsocketserver.broadcast_desktops("rm_coin", coin.id)
+            }
+        }
 
         xsocketserver.broadcast_desktops("move-ver", { player: ws.id, y: current_player.y})
     })
@@ -174,8 +206,8 @@ function gungameserver() {
             gameFrames++;
             console.log(gameFrames)
             if (gameFrames % 3 == 0) {
-                let nCoin = new Coin(Math.floor(Math.random()*640), Math.floor(Math.random()*640))
-                coins[get_id()] = nCoin;
+                let nCoin = new Coin(Math.floor(Math.random()*640), Math.floor(Math.random()*640), get_id())
+                coins[nCoin.id] = nCoin;
                 xsocketserver.broadcast_desktops("new_coin", nCoin)
             }
         }
@@ -188,6 +220,13 @@ function gungameserver() {
     run();
 }
 
+function collidesWith(player, ox, oy, ow, oh) {
+    return !(player.x + player.width < ox || player.x > ox + ow || player.y > oy + oh || player.y + player.height < oy);
+    // if ((current_player.y < wall.y + wall.sideLength && current_player.y + current_player.width > wall.y && current_player.x >= wall.x + wall.sideLength) || (current_player.y < wall.y + wall.sideLength && current_player.y + current_player.height > wall.y && current_player.x + current_player.width <= wall.x) || (current_player.x < wall.x + wall.sideLength && current_player.x + current_player.width > wall.x && current_player.y >= wall.y + wall.sideLength) || (current_player.x < wall.x + wall.sideLength && current_player.x + current_player.width > wall.x && current_player.y + current_player.height <= wall.y))
+
+
+}
+
 class Player {
     constructor(id, ip) {
         this.x = 0;
@@ -197,6 +236,7 @@ class Player {
         this.id = id;
         this.hp = 10;
         this.ip = ip;
+        this.coins = 0;
     }
 }
 
@@ -240,11 +280,13 @@ function min(a, b) {
 }
 
 class Coin {
-    constructor(x, y) {
+    constructor(x, y, id) {
         this.x = x;
         this.y = y;
         this.side = 15;
+        this.id = id;
     }
 }
 
 module.exports = { gungameserver };
+

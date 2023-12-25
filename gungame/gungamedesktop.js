@@ -111,8 +111,17 @@ desksocket.register_event('create_bomb', (data) => {
 desksocket.register_event('new_coin', (data) => {
     console.log(data)
     const coinElement = document.createElement('div')
+    coinElement.id = `coin-${data.id}`;
     coinElement.style = `position: absolute; background: green; width: ${data.side}px; height: ${data.side}px; left: ${data.x}px; top: ${data.y}px;`
     canvas.appendChild(coinElement)
+})
+
+desksocket.register_event('rm_coin', (data) => {
+    console.log(data)
+    console.log('rm_coin', data)
+    coinToDelete = document.querySelector(`#coin-${data}`)
+    console.log()
+    canvas.removeChild(coinToDelete);
 })
 
 desksocket.register_event('explode_bomb', (data) => {
