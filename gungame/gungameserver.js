@@ -27,6 +27,10 @@ function gungameserver() {
     let coinFrames = 0;
 
     xsocketserver.register_event("phone", "move-left", (ws) => {
+        // can't move if still generating coins
+        if (coinFrames < 5*FPS) {
+            return;
+        }
         current_player = players[ws.id];
 
         // detecting future collision
@@ -57,6 +61,10 @@ function gungameserver() {
     })
 
     xsocketserver.register_event('phone', 'move-right', (ws) => {
+        // can't move if still generating coins
+        if (coinFrames < 5*FPS) {
+            return;
+        }
         current_player = players[ws.id];
         let future_x = min(640 - current_player.width, current_player.x + SPEED);
 
@@ -85,6 +93,10 @@ function gungameserver() {
     })
 
     xsocketserver.register_event('phone', 'move-up', (ws) => {
+        // can't move if still generating coins
+        if (coinFrames < 5*FPS) {
+            return;
+        }
         current_player = players[ws.id];
         let future_y = max(0, current_player.y - SPEED);
         
@@ -114,6 +126,10 @@ function gungameserver() {
     })
     
     xsocketserver.register_event('phone', 'move-down', (ws) => {
+        // can't move if still generating coins
+        if (coinFrames < 5*FPS) {
+            return;
+        }
         current_player = players[ws.id];
         let future_y = min(640 - current_player.height, current_player.y + SPEED);
 
