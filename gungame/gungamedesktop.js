@@ -144,3 +144,13 @@ desksocket.register_event('change_player_score', (data) => {
 
 
 })
+
+desksocket.register_event('newgame', (data) => {
+    console.log(data)
+    for (let coinid of data) {
+        coinToDelete = document.getElementById(`coin-${coinid}`)
+        if (coinToDelete != null) {
+            canvas.removeChild(coinToDelete)
+        }
+    }
+})

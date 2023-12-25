@@ -23,7 +23,8 @@ function gungameserver() {
     const bombs = {
         0: new Bomb(0, 0, 1)
     };
-    const coins = {}
+    let coins = {}
+    let coinFrames = 0;
 
     xsocketserver.register_event("phone", "move-left", (ws) => {
         current_player = players[ws.id];
@@ -171,7 +172,31 @@ function gungameserver() {
         }
     }
 
-    let gameFrames = 0;
+    xsocketserver.register_event('phone', 'toggle_reset', (ws, data) => {
+        players[ws.id].reset_agree = !players[ws.id].reset_agree;
+
+        all_agree = true;
+        for (let player of Object.values(players)) {
+            if (!player.reset_agree ) {
+                all_agree = false;
+                break;
+            }
+        }
+
+        if (all_agree) {
+            xsocketserver.broadcast_phones('reset_state', 'not_ready')
+            xsocketserver.broadcast_desktops('newgame', Object.keys(coins))
+            coins = {}
+            coinFrames = 0;
+            // reset
+            // spawn all players in corner
+            // destroy all coins
+            // give countdown
+        } else {
+            ws_send(ws, 'reset_state', players[ws.id].reset_agree ? 'ready' : 'not_ready')
+        }
+        // send msg to phone
+    })
 
     function update() {
         for (let bomb of Object.values(bombs)) {
@@ -183,10 +208,10 @@ function gungameserver() {
             bomb.framesTilBlow--;
         }
 
-        if (gameFrames < FPS*5) {
-            gameFrames++;
-            console.log(gameFrames)
-            if (gameFrames % 3 == 0) {
+        if (coinFrames < FPS*5) {
+            coinFrames++;
+            console.log(coinFrames)
+            if (coinFrames % 3 == 0) {
                 let nCoin = new Coin(Math.floor(Math.random()*640), Math.floor(Math.random()*640), get_id())
                 coins[nCoin.id] = nCoin;
                 xsocketserver.broadcast_desktops("new_coin", nCoin)
@@ -228,6 +253,7 @@ class Player {
         this.hp = 10;
         this.ip = ip;
         this.coins = 0;
+        this.reset_agree = false;
     }
 }
 

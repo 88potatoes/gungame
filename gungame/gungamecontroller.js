@@ -1,6 +1,8 @@
 const { sendJSON, ws_send } = require('../ws-helpers')
-const info = require('../info.json')
-const websocket = new WebSocket(`ws://${info.ip_address}:8082`)
+const info = require('../info.json');
+const { XSocketClient } = require('../ws-helpers-client');
+// const websocket = new WebSocket(`ws://${info.ip_address}:8082`)
+const phonesocket = new XSocketClient('phone', `ws://${info.ip_address}:8082`)
 console.log(" ing")
 
 let goup = false;
@@ -52,9 +54,15 @@ rightbutton.addEventListener('touchend', (e) => {
 const bombbutton = document.getElementById('bombbutton');
 bombbutton.addEventListener('touchstart', (e) => {
     e.preventDefault()
-    sendJSON(websocket, {command: 'drop-bomb'})
+    sendJSON(phonesocket, {command: 'drop-bomb'})
 })
 
+const resetbutton = document.getElementById('resetbutton');
+resetbutton.addEventListener('touchstart', (e) => {
+    e.preventDefault();
+    // console.log('resetting toggle')
+    ws_send(phonesocket, 'toggle_reset')
+})
 
 // prevent double click zoom on phone
 document.ondblclick = function(e) {
@@ -72,16 +80,16 @@ window.requestAnimationFrame(loop)
 
 function update() {
     if (goup) {
-        sendJSON(websocket, {command: "move-up"})
+        sendJSON(phonesocket, {command: "move-up"})
     }
     if (godown) {
-        sendJSON(websocket, {command: "move-down"})
+        sendJSON(phonesocket, {command: "move-down"})
     }
     if (goleft) {
-        sendJSON(websocket, {command: "move-left"})
+        sendJSON(phonesocket, {command: "move-left"})
     }
     if (goright) {
-        sendJSON(websocket, {command: "move-right"})
+        sendJSON(phonesocket, {command: "move-right"})
     }
 }
 
@@ -91,6 +99,10 @@ document.body.oncontextmenu = (e) => {
 
 const dcmessage = document.getElementById('dc-message')
 
-websocket.onclose = (e) => {
+phonesocket.onclose = (e) => {
     dcmessage.innerText = 'You have disconnected. Please refresh to rejoin'
 }
+
+phonesocket.register_event('reset_state', (data) => {
+    resetbutton.innerText = data === 'ready' ? 'READY' : '';
+})

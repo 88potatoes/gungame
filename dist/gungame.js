@@ -146,6 +146,16 @@ desksocket.register_event('change_player_score', (data) => {
 
 })
 
+desksocket.register_event('newgame', (data) => {
+    console.log(data)
+    for (let coinid of data) {
+        coinToDelete = document.getElementById(`coin-${coinid}`)
+        if (coinToDelete != null) {
+            canvas.removeChild(coinToDelete)
+        }
+    }
+})
+
 },{"../info.json":2,"../ws-helpers-client.js":3,"../ws-helpers.js":4}],2:[function(require,module,exports){
 module.exports={
     "ip_address": "192.168.50.29"
