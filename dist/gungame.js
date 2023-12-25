@@ -15,7 +15,6 @@ console.log(info);
 const desksocket = new XSocketClient("desktop", `ws://${info.ip_address}:8082`)
 console.log('after loading websocket')
 
-const registered_events = {}
 let players = {}
 let playerElements = {}
 let bullets = {}
@@ -108,6 +107,13 @@ desksocket.register_event('create_bomb', (data) => {
     bombElement.style = `position: absolute; background: green; width: ${data.sideLength}px; height: ${data.sideLength}px; left: ${data.x}px; top: ${data.y}px;`
     bombElements[data.id] = bombElement;
     canvas.appendChild(bombElement)
+})
+
+desksocket.register_event('new_coin', (data) => {
+    console.log(data)
+    const coinElement = document.createElement('div')
+    coinElement.style = `position: absolute; background: green; width: ${data.side}px; height: ${data.side}px; left: ${data.x}px; top: ${data.y}px;`
+    canvas.appendChild(coinElement)
 })
 
 desksocket.register_event('explode_bomb', (data) => {

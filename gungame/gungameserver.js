@@ -23,6 +23,7 @@ function gungameserver() {
     const bombs = {
         0: new Bomb(0, 0, 1)
     };
+    const coins = {}
 
     xsocketserver.register_event("phone", "move-left", (ws) => {
         current_player = players[ws.id];
@@ -157,6 +158,8 @@ function gungameserver() {
         }
     }
 
+    let gameFrames = 0;
+
     function update() {
         for (let bomb of Object.values(bombs)) {
             if (bomb.framesTilBlow === 0) {
@@ -165,6 +168,16 @@ function gungameserver() {
                 delete bombs[bomb.id]
             }
             bomb.framesTilBlow--;
+        }
+
+        if (gameFrames < FPS*5) {
+            gameFrames++;
+            console.log(gameFrames)
+            if (gameFrames % 3 == 0) {
+                let nCoin = new Coin(Math.floor(Math.random()*640), Math.floor(Math.random()*640))
+                coins[get_id()] = nCoin;
+                xsocketserver.broadcast_desktops("new_coin", nCoin)
+            }
         }
     }
     
@@ -224,6 +237,14 @@ function max(a, b) {
 
 function min(a, b) {
     return a < b ? a : b;
+}
+
+class Coin {
+    constructor(x, y) {
+        this.x = x;
+        this.y = y;
+        this.side = 15;
+    }
 }
 
 module.exports = { gungameserver };
