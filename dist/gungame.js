@@ -32,6 +32,7 @@ desksocket.register_event("init_players", (data) => {
         // console.log(player)
         let playerEl = document.createElement('div');
         playerEl.innerText = '0';
+        playerEl.id = `p${player.id}`
         playerEl.style = `position: absolute; background: red; width: ${player.width}px; height: ${player.height}px; left: ${player.x}px; top: ${player.y}px; border: 1px solid black;`;
         playerElements[player.id] = playerEl;
         canvas.appendChild(playerElements[player.id]);
@@ -158,7 +159,7 @@ desksocket.register_event('newgame', (data) => {
 
 },{"../info.json":2,"../ws-helpers-client.js":3,"../ws-helpers.js":4}],2:[function(require,module,exports){
 module.exports={
-    "ip_address": "192.168.50.29"
+    "ip_address": "172.20.10.2"
 }
 },{}],3:[function(require,module,exports){
 function parseJSON(json) {

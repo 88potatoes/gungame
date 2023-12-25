@@ -31,6 +31,7 @@ desksocket.register_event("init_players", (data) => {
         // console.log(player)
         let playerEl = document.createElement('div');
         playerEl.innerText = '0';
+        playerEl.id = `p${player.id}`
         playerEl.style = `position: absolute; background: red; width: ${player.width}px; height: ${player.height}px; left: ${player.x}px; top: ${player.y}px; border: 1px solid black;`;
         playerElements[player.id] = playerEl;
         canvas.appendChild(playerElements[player.id]);

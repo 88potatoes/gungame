@@ -109,7 +109,7 @@ phonesocket.register_event('reset_state', (data) => {
 })
 },{"../info.json":2,"../ws-helpers":4,"../ws-helpers-client":3}],2:[function(require,module,exports){
 module.exports={
-    "ip_address": "192.168.50.29"
+    "ip_address": "172.20.10.2"
 }
 },{}],3:[function(require,module,exports){
 function parseJSON(json) {
