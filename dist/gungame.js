@@ -31,7 +31,8 @@ desksocket.register_event("init_players", (data) => {
     for (let player of Object.values(players)) {
         // console.log(player)
         let playerEl = document.createElement('div');
-        playerEl.style = `position: absolute; background: red; width: ${player.width}px; height: ${player.height}px; left: ${player.x}px; top: ${player.y}px;`;
+        playerEl.innerText = '0';
+        playerEl.style = `position: absolute; background: red; width: ${player.width}px; height: ${player.height}px; left: ${player.x}px; top: ${player.y}px; border: 1px solid black;`;
         playerElements[player.id] = playerEl;
         canvas.appendChild(playerElements[player.id]);
 
@@ -51,7 +52,8 @@ desksocket.register_event('add_player', (data) => {
     console.log("players", players)
 
     let playerEl = document.createElement('div');
-    playerEl.style = `position: absolute; background: red; width: ${player.width}px; height: ${player.height}px; left: ${player.x}px; top: ${player.y}px;`;
+    playerEl.innerText = '0';
+    playerEl.style = `position: absolute; background: red; width: ${player.width}px; height: ${player.height}px; left: ${player.x}px; top: ${player.y}px; border: 1px solid black;`;
     playerEl.id = `p${player.id}`
     playerElements[player.id] = playerEl;
     canvas.appendChild(playerElements[player.id]);
@@ -118,10 +120,7 @@ desksocket.register_event('new_coin', (data) => {
 })
 
 desksocket.register_event('rm_coin', (data) => {
-    console.log(data)
-    console.log('rm_coin', data)
     coinToDelete = document.querySelector(`#coin-${data}`)
-    console.log()
     canvas.removeChild(coinToDelete);
 })
 
@@ -131,14 +130,20 @@ desksocket.register_event('explode_bomb', (data) => {
 })
 
 desksocket.register_event('init_coins', (data) => {
-    console.log(data)
     for (let coin of data) {
-        console.log(coin)
         const coinElement = document.createElement('div')
         coinElement.id = `coin-${coin.id}`;
         coinElement.style = `position: absolute; background: green; width: ${coin.side}px; height: ${coin.side}px; left: ${coin.x}px; top: ${coin.y}px;`
         canvas.appendChild(coinElement)
     }
+})
+
+desksocket.register_event('change_player_score', (data) => {
+    console.log(data)
+    console.log(players)
+    document.querySelector(`#p${data.id}`).innerText = data.score;
+
+
 })
 
 },{"../info.json":2,"../ws-helpers-client.js":3,"../ws-helpers.js":4}],2:[function(require,module,exports){

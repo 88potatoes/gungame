@@ -205,6 +205,7 @@ function gungameserver() {
                 xsocketserver.broadcast_desktops("rm_coin", coin.id)
                 delete coins[coin.id];
                 current_player.coins++;
+                xsocketserver.broadcast_desktops('change_player_score', {id: current_player.id, score: current_player.coins})
             }
         }
     }
